@@ -1,4 +1,4 @@
-package com.snacksack.snacksack.model;
+package com.snacksack.snacksack.model.spoons;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

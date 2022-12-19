@@ -1,4 +1,4 @@
-package com.snacksack.snacksack.model;
+package com.snacksack.snacksack.model.spoons;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Menu {
-    List<SubMenu> subMenu;
+public class MenuResponse {
+    List<Menu> menus;
 }

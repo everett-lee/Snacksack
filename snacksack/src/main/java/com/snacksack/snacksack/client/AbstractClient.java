@@ -1,21 +1,29 @@
 package com.snacksack.snacksack.client;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.annotation.PropertySource;
+import com.snacksack.snacksack.model.ApiMenuData;
+import com.snacksack.snacksack.model.NormalisedProduct;
+import com.snacksack.snacksack.normaliser.Normaliser;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.List;
 
-@PropertySource("classpath:application.properties")
-public abstract class AbstractClient {
-    final String BASE_ENDPOINT = "https://static.wsstack.nn4maws.net/content/v3/menus/{locationId}.json";
+public abstract class AbstractClient<T extends ApiMenuData> {
     final ObjectMapper objectMapper = new ObjectMapper();
-    HttpClient client;
+    final String baseEndpoint;
+    final HttpClient client;
+    final Normaliser<T> normaliser;
 
-    public AbstractClient(HttpClient client) {
+    public AbstractClient(HttpClient client, String baseEndpoint, Normaliser<T> normaliser) {
+        this.baseEndpoint = baseEndpoint;
         this.client = client;
+        this.normaliser = normaliser;
     }
 
+    abstract T getMenuResponse(URI uri) throws HttpClientErrorException;
 
+    abstract List<NormalisedProduct> getProducts(T apiMenuData);
 }
 

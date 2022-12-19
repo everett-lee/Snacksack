@@ -1,6 +1,9 @@
 package com.snacksack.snacksack.client;
 
-import com.snacksack.snacksack.model.MenuResponse;
+import com.snacksack.snacksack.model.NormalisedProduct;
+import com.snacksack.snacksack.model.spoons.MenuResponse;
+import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
+import com.snacksack.snacksack.normaliser.SpoonsNormaliser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -11,19 +14,24 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-@Slf4j
-public class MenuClient extends AbstractClient {
 
-    public MenuClient(HttpClient client) {
-        super(client);
+@Slf4j
+public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
+    public SpoonsClient(HttpClient client) {
+        super(
+                client,
+                "https://static.wsstack.nn4maws.net/content/v3/menus/{locationId}.json",
+                new SpoonsNormaliser()
+        );
     }
 
-    public MenuResponse getMenuResponse(int locationId) throws HttpClientErrorException {
-        final URI uri = constructURI(locationId);
+    @Override
+    public SpoonsApiMenuData getMenuResponse(URI uri) throws HttpClientErrorException {
         HttpRequest request = HttpRequest.newBuilder()
                 .timeout(Duration.of(10, SECONDS))
                 .uri(uri)
@@ -36,7 +44,8 @@ public class MenuClient extends AbstractClient {
                 log.error("Request failed with response code {}", res.statusCode());
                 throw new RuntimeException();
             }
-            return objectMapper.readValue(res.body(), MenuResponse.class);
+            final MenuResponse menuResponse = objectMapper.readValue(res.body(), MenuResponse.class);
+            return new SpoonsApiMenuData(menuResponse);
         } catch (HttpClientErrorException e) {
             log.error("Failed to GET menu response. Returned status: {}", e.getStatusCode());
             throw e;
@@ -47,12 +56,18 @@ public class MenuClient extends AbstractClient {
         }
     }
 
-    private URI constructURI(int locationId) {
+
+    public URI constructURI(int locationId) {
         final Map<String, Integer> pathVars = Map.of(
                 "locationId", locationId
         );
 
-        final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(BASE_ENDPOINT);
+        final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(this.baseEndpoint);
         return uriBuilder.buildAndExpand(pathVars).toUri();
+    }
+
+    @Override
+    List<NormalisedProduct> getProducts(SpoonsApiMenuData apiMenuData) {
+        return this.normaliser.getNormalisedProducts(apiMenuData);
     }
 }

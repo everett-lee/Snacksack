@@ -1,0 +1,100 @@
+package com.snacksack.snacksack.dp;
+
+import com.snacksack.snacksack.helpers.Helpers;
+import com.snacksack.snacksack.model.NormalisedProduct;
+import com.snacksack.snacksack.model.answer.Answer;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
+class BottomUpSolverTest {
+    public BottomUpSolver bottomUpSolver = new BottomUpSolver();
+
+    @Test
+    public void testSingleItemCaseWhenFits() {
+        List<NormalisedProduct> products = List.of(new NormalisedProduct("Item1", 55, 2502));
+        Answer answer = bottomUpSolver.solve(2502, products);
+        assertThat(answer.getTotalCalories(), is(equalTo(55)));
+        assertThat(answer.getTotalCost(), is(equalTo(25.02)));
+        assertThat(answer.getNormalisedProducts(), is(equalTo(products)));
+    }
+
+    @Test
+    public void testSingleItemCaseWhenNotFits() {
+        List<NormalisedProduct> products = List.of(new NormalisedProduct("Item1", 55, 2503));
+        Answer answer = bottomUpSolver.solve(2502, products);
+        assertThat(answer.getTotalCalories(), is(equalTo(0)));
+        assertThat(answer.getTotalCost(), is(equalTo(0.0)));
+        assertThat(answer.getNormalisedProducts(), is(equalTo(List.of())));
+    }
+
+    @Test
+    public void testMultipleItemsBasicCase() {
+        List<NormalisedProduct> products = List.of(
+                new NormalisedProduct("Item1", 800, 100),
+                new NormalisedProduct("Item2", 400, 200),
+                new NormalisedProduct("Item3", 0, 300),
+                new NormalisedProduct("Item4", 500, 200),
+                new NormalisedProduct("Item5", 200, 200)
+        );
+        Answer answer = bottomUpSolver.solve(400, products);
+        assertThat(answer.getTotalCalories(), is(equalTo(1300)));
+        assertThat(answer.getNormalisedProducts(), is(equalTo(
+                List.of(
+                        products.get(3),
+                        products.get(0)
+                )
+        )));
+        assertThat(answer.getTotalCost(), is(equalTo(3.0)));
+    }
+
+    @Test
+    public void testMultipleItemsBasicCaseTwo() {
+        List<NormalisedProduct> products = List.of(
+                new NormalisedProduct("Item1", 200, 1644),
+                new NormalisedProduct("Item2", 700, 6500),
+                new NormalisedProduct("Item3", 450, 3700),
+                new NormalisedProduct("Item4", 271, 2218),
+                new NormalisedProduct("Item5", 202, 2226)
+        );
+        Answer answer = bottomUpSolver.solve(8144, products);
+        assertThat(answer.getTotalCalories(), is(equalTo(923)));
+        assertThat(answer.getNormalisedProducts(), is(equalTo(
+                List.of(
+                        products.get(4),
+                        products.get(3),
+                        products.get(2)
+                )
+        )));
+        assertThat(answer.getTotalCost(), is(equalTo(81.44)));
+    }
+
+    @Test
+    public void testMultipleItemsCaseOne() throws IOException {
+        List<NormalisedProduct> testProds = Helpers.testCaseFileToProductList("src/test/resources/ks-test-case-1");
+        Answer answer = bottomUpSolver.solve(200000, testProds);
+        assertThat(answer.getTotalCalories(), is(equalTo(8085)));
+        assertThat(answer.getTotalCost(), is(equalTo(1998.0)));
+    }
+
+    @Test
+    public void testMultipleItemsCaseTwo() throws IOException {
+        List<NormalisedProduct> testProds = Helpers.testCaseFileToProductList("src/test/resources/ks-test-case-2");
+        Answer answer = bottomUpSolver.solve(200000, testProds);
+        assertThat(answer.getTotalCalories(), is(equalTo(2210)));
+        assertThat(answer.getTotalCost(), is(equalTo(1998.0)));
+    }
+
+    @Test
+    public void testMultipleItemsCaseThree() throws IOException {
+        List<NormalisedProduct> testProds = Helpers.testCaseFileToProductList("src/test/resources/ks-test-case-3");
+        Answer answer = bottomUpSolver.solve(200000, testProds);
+        assertThat(answer.getTotalCalories(), is(equalTo(475)));
+        assertThat(answer.getTotalCost(), is(equalTo(1939.0)));
+    }
+}
