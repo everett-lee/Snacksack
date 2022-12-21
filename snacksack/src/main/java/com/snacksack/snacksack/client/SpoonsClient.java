@@ -14,8 +14,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -67,7 +67,7 @@ public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
     }
 
     @Override
-    List<NormalisedProduct> getProducts(SpoonsApiMenuData apiMenuData) {
+    public Set<NormalisedProduct> getProducts(SpoonsApiMenuData apiMenuData) {
         return this.normaliser.getNormalisedProducts(apiMenuData);
     }
 }

@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class NormalisedProduct {
-    String name;
-    int calories;
-    long price;
+    public final String name;
+    public final int calories;
+    public final long price;
 
     public NormalisedProduct(String name, int calories, int price) {
         this.name = name;

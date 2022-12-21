@@ -1,12 +1,12 @@
-package com.snacksack.snacksack.dp;
+package com.snacksack.snacksack.dp.bottomUp;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MemMatrix {
-    int[][] matrix;
-    int nRows;
-    int nCols;
+    private final int[][] matrix;
+    public final int nRows;
+    public final int nCols;
 
     public MemMatrix(int m, int n) {
         if (m <= 0 || n <= 0) {

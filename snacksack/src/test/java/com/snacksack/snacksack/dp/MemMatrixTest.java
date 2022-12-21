@@ -1,5 +1,6 @@
 package com.snacksack.snacksack.dp;
 
+import com.snacksack.snacksack.dp.bottomUp.MemMatrix;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

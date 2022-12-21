@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 public class Answer {
-    int totalCalories;
-    double totalCost;
+    public final int totalCalories;
+    public final double totalCost;
     List<NormalisedProduct> normalisedProducts;
 
     public Answer(int totalCalories, List<NormalisedProduct> normalisedProducts) {

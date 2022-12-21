@@ -1,5 +1,6 @@
-package com.snacksack.snacksack.dp;
+package com.snacksack.snacksack.dp.bottomUp;
 
+import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
 

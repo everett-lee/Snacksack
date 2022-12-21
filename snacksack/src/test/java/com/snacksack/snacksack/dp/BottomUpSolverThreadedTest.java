@@ -1,6 +1,8 @@
+
 package com.snacksack.snacksack.dp;
 
 import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
+import com.snacksack.snacksack.dp.bottomUp.BottomUpSolverThreaded;
 import com.snacksack.snacksack.helpers.Helpers;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
@@ -15,8 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-class BottomUpSolverTest {
-    public BottomUpSolver bottomUpSolver = new BottomUpSolver();
+class BottomUpSolverThreadedTest {
+    public BottomUpSolver bottomUpSolver = new BottomUpSolverThreaded(10);
 
     @Test
     public void testSingleItemCaseWhenFits() {
@@ -100,4 +102,5 @@ class BottomUpSolverTest {
         assertThat(answer.getTotalCalories(), is(equalTo(475)));
         assertThat(answer.getTotalCost(), is(equalTo(1939.0)));
     }
+    
 }
