@@ -49,13 +49,13 @@ public class DpBenchmark {
     @Benchmark
     public void testBottomUp() {
         Solver solver = new BottomUpSolver();
-        solver.solve(100_000, this.products);
+        solver.solve(75_000, this.products);
     }
 
     @Benchmark
     public void testBottomUpThreaded() {
         Solver solver = new BottomUpSolverThreaded(5_000);
-        solver.solve(100_000, this.products);
+        solver.solve(75_000, this.products);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,15 @@ public class DpBenchmark {
     //
     // total money = 250,000, threshold = 5_000
     // single thread = 1472ms, multi thread = 1026ms
+    //
+    // total money = 100,000, threshold = 5_000
+    // single thread = 408ms, multi thread = 324ms
+    //
+    // total money = 75,000, threshold = 5_000
+    // single thread = 283ms, multi thread = 315ms
+    //
+    // total money = 50,000, threshold = 5_000
+    // single thread = 189ms, multi thread = 224ms
     //
 }
 

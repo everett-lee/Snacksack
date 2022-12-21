@@ -3,10 +3,14 @@ package com.snacksack.snacksack.dp.topDown;
 import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Stream;
 
+@Service
+@Qualifier("TopDownSolver")
 public class TopDownSolver implements Solver {
 
     @Override

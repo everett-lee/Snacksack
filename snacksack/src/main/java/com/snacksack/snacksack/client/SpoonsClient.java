@@ -5,6 +5,8 @@ import com.snacksack.snacksack.model.spoons.MenuResponse;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import com.snacksack.snacksack.normaliser.SpoonsNormaliser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 

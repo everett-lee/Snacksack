@@ -3,11 +3,14 @@ package com.snacksack.snacksack.dp.bottomUp;
 import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Service
 public class BottomUpSolver implements Solver {
 
     @Override

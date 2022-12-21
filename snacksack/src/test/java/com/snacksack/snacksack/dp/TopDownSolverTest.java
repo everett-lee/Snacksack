@@ -4,6 +4,7 @@ import com.snacksack.snacksack.dp.topDown.TopDownSolver;
 import com.snacksack.snacksack.helpers.Helpers;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
+import com.snacksack.snacksack.model.answer.AnswerProduct;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,7 +25,11 @@ class TopDownSolverTest {
         Answer answer = solver.solve(2502, products);
         assertThat(answer.getTotalCalories(), is(equalTo(55)));
         assertThat(answer.getTotalCost(), is(equalTo(25.02)));
-        assertThat(answer.getNormalisedProducts(), is(equalTo(products.stream().toList())));
+        assertThat(answer.getNormalisedProducts(), is(equalTo(products
+                .stream()
+                .map(AnswerProduct::new)
+                .toList()
+        )));
     }
 
     @Test
@@ -49,8 +54,8 @@ class TopDownSolverTest {
         assertThat(answer.getTotalCalories(), is(equalTo(1300)));
         assertThat(new HashSet<>(answer.getNormalisedProducts()), is(equalTo(
                 Set.of(
-                        products.get(3),
-                        products.get(0)
+                        new AnswerProduct(products.get(3)),
+                        new AnswerProduct(products.get(0))
                 )
         )));
         assertThat(answer.getTotalCost(), is(equalTo(3.0)));
@@ -69,9 +74,9 @@ class TopDownSolverTest {
         assertThat(answer.getTotalCalories(), is(equalTo(923)));
         assertThat(new HashSet<>(answer.getNormalisedProducts()), is(equalTo(
                 Set.of(
-                        products.get(4),
-                        products.get(3),
-                        products.get(2)
+                        new AnswerProduct(products.get(4)),
+                        new AnswerProduct(products.get(3)),
+                        new AnswerProduct(products.get(2))
                 )
         )));
         assertThat(answer.getTotalCost(), is(equalTo(81.44)));

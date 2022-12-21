@@ -1,7 +1,7 @@
 package com.snacksack.snacksack.client;
 
-import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
 import com.snacksack.snacksack.dp.Solver;
+import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
 import com.snacksack.snacksack.helpers.Helpers;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.answer.Answer;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class MenuClientTest {
+
     @Test
     public void testSpoonsClientGet() throws IOException, InterruptedException {
         //given:

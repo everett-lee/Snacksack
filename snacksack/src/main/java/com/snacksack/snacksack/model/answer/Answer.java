@@ -9,11 +9,13 @@ import java.util.List;
 public class Answer {
     public final int totalCalories;
     public final double totalCost;
-    List<NormalisedProduct> normalisedProducts;
+    List<AnswerProduct> normalisedProducts;
 
     public Answer(int totalCalories, List<NormalisedProduct> normalisedProducts) {
         this.totalCalories = totalCalories;
-        this.normalisedProducts = normalisedProducts;
+        this.normalisedProducts = normalisedProducts
+                .stream()
+                .map(AnswerProduct::new).toList();
         this.totalCost = normalisedProducts
                 .stream()
                 .mapToLong(NormalisedProduct::getPrice).sum() / 100.0;
