@@ -4,11 +4,13 @@ import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.spoons.MenuResponse;
 import com.snacksack.snacksack.model.spoons.Product;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class SpoonsNormaliser implements Normaliser<SpoonsApiMenuData> {
     @Override
     public Set<NormalisedProduct> getNormalisedProducts(SpoonsApiMenuData apiMenuData) {
@@ -24,11 +26,14 @@ public class SpoonsNormaliser implements Normaliser<SpoonsApiMenuData> {
     }
 
     private Set<NormalisedProduct> normalise(List<Product> products) {
-        return products.stream().map(product -> {
+        final Set<NormalisedProduct> normalisedProducts = products.stream().map(product -> {
             final String name = product.getDisplayName();
             final int calories = product.getCalories();
             final float price = product.getPriceValue();
             return new NormalisedProduct(name, calories, price);
         }).collect(Collectors.toSet());
+
+        log.info("Normalised {} products", normalisedProducts.size());
+        return normalisedProducts;
     }
 }

@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class TopDownSolver implements Solver {
+
     @Override
     public Answer solve(int totalMoney, Set<NormalisedProduct> products) {
         final Map<MemoKey, RecursiveHelperResult> mem = new HashMap<>();

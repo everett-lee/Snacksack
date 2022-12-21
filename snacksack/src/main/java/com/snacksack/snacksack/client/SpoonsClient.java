@@ -39,12 +39,14 @@ public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
                 .build();
 
         try {
+            log.info("Fetching data from spoons at URI {}", uri);
             HttpResponse<String> res = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
                 log.error("Request failed with response code {}", res.statusCode());
                 throw new RuntimeException();
             }
             final MenuResponse menuResponse = objectMapper.readValue(res.body(), MenuResponse.class);
+            log.info("Data fetched");
             return new SpoonsApiMenuData(menuResponse);
         } catch (HttpClientErrorException e) {
             log.error("Failed to GET menu response. Returned status: {}", e.getStatusCode());
