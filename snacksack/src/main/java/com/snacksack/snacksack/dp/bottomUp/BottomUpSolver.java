@@ -6,11 +6,12 @@ import com.snacksack.snacksack.model.answer.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BottomUpSolver implements Solver {
 
     @Override
-    public Answer solve(int totalMoney, List<NormalisedProduct> products) {
+    public Answer solve(int totalMoney, Set<NormalisedProduct> products) {
         if (products.isEmpty()) {
             return EMPTY_ANSWER;
         }
@@ -20,21 +21,22 @@ public class BottomUpSolver implements Solver {
 
         final MemMatrix memMatrix = new MemMatrix(m, n);
 
-        final long firstProductCost = products.get(0).getPrice();
-        final int firstProductCalories = products.get(0).getCalories();
+        final List<NormalisedProduct> listedProducts = products.stream().toList();
+        final long firstProductCost = listedProducts.get(0).getPrice();
+        final int firstProductCalories = listedProducts.get(0).getCalories();
 
         // Case where only one item provided
         if (m == 1) {
             if (firstProductCost <= totalMoney) {
-                return new Answer(firstProductCalories, products);
+                return new Answer(firstProductCalories, listedProducts);
             } else {
                 return EMPTY_ANSWER;
             }
         }
 
-        this.iterateMatrix(memMatrix, products);
+        this.iterateMatrix(memMatrix, listedProducts);
 
-        final List<NormalisedProduct> answerProducts = this.getAnswerProducts(memMatrix, products, memMatrix.getAnswer());
+        final List<NormalisedProduct> answerProducts = this.getAnswerProducts(memMatrix, listedProducts, memMatrix.getAnswer());
         return new Answer(memMatrix.getAnswer(), answerProducts);
     }
 
@@ -52,17 +54,21 @@ public class BottomUpSolver implements Solver {
         }
 
         for (int i = 1; i < m; i++) {
-            long productCost = products.get(i).getPrice();
-            int productCalories = products.get(i).getCalories();
+            iterateRow(n, i, memMatrix, products.get(i));
+        }
+    }
 
-            for (int money = 0; money < n; money++) {
-                if (money < productCost) {
-                    memMatrix.setCell(i, money, memMatrix.getCell(i - 1, money));
-                } else {
-                    int take = productCalories + memMatrix.getCell(i - 1, money - productCost);
-                    int leave = memMatrix.getCell(i - 1, money);
-                    memMatrix.setCell(i, money, Math.max(take, leave));
-                }
+    protected void iterateRow(int n, int i, MemMatrix memMatrix, NormalisedProduct product) {
+        long productCost = product.getPrice();
+        int productCalories = product.getCalories();
+
+        for (int money = 0; money < n; money++) {
+            if (money < productCost) {
+                memMatrix.setCell(i, money, memMatrix.getCell(i - 1, money));
+            } else {
+                int take = productCalories + memMatrix.getCell(i - 1, money - productCost);
+                int leave = memMatrix.getCell(i - 1, money);
+                memMatrix.setCell(i, money, Math.max(take, leave));
             }
         }
     }
