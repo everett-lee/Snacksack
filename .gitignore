@@ -53,3 +53,9 @@ atlassian-ide-plugin.xml
 
 # Generated
 **/generated
+
+# files
+*.txt
+
+# helper scrips
+get_ids.py
