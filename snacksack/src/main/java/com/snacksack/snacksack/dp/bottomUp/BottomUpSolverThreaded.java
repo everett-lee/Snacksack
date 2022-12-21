@@ -2,7 +2,6 @@ package com.snacksack.snacksack.dp.bottomUp;
 
 import com.snacksack.snacksack.model.NormalisedProduct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ForkJoinPool;

@@ -44,17 +44,27 @@ public class Controller {
 
         try {
             final Restaurant parsedRestaurant = Restaurant.valueOf(selectedRestaurant);
-            if (parsedRestaurant.equals(Restaurant.SPOONS)) {
-                URI uri = spoonsClient.constructURI(43);
-                SpoonsApiMenuData menuResponse = spoonsClient.getMenuResponse(uri);
-                Set<NormalisedProduct> normalisedProducts = spoonsClient.getProducts(menuResponse);
-                // check response size for threaded option
-                return bottomUpSolver.solve(intMoney, normalisedProducts);
+            switch (parsedRestaurant) {
+                case SPOONS -> {
+                    log.info("Solving for Spoons menu");
+                    return this.handleSpoonsRequest(intMoney);
+                }
+                case NANDOS -> {
+                    log.info("Solving for Nandos menu");
+                }
             }
 
         } catch (IllegalArgumentException e) {
             log.error("Exception {}", e.getMessage());
         }
         return new Answer(0, List.of());
+    }
+
+    private Answer handleSpoonsRequest(int money) {
+        final URI uri = spoonsClient.constructURI(43);
+        final SpoonsApiMenuData menuResponse = spoonsClient.getMenuResponse(uri);
+        final Set<NormalisedProduct> normalisedProducts = spoonsClient.getProducts(menuResponse);
+        // check response size for threaded option
+        return bottomUpSolver.solve(money, normalisedProducts);
     }
 }
