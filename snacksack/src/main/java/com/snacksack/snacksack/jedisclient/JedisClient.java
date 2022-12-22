@@ -1,16 +1,16 @@
 package com.snacksack.snacksack.jedisclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.snacksack.snacksack.model.ApiMenuData;
+import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
-import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
-import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 
 import java.util.Base64;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class JedisClient {
@@ -22,11 +22,11 @@ public class JedisClient {
         this.objectMapper = objectMapper;
     }
 
-    public void setMenuData(Restaurant restaurant, int restaurantId, ApiMenuData apiMenuData) throws JsonProcessingException {
+    public void setProducts(Restaurant restaurant, int restaurantId, Set<NormalisedProduct> products) throws JsonProcessingException {
         final String key = getCacheKey(restaurant, restaurantId);
 
         try {
-            final String stringJson = objectMapper.writeValueAsString(apiMenuData);
+            final String stringJson = objectMapper.writeValueAsString(products);
             final String jsonStringEncoded = Base64.getEncoder().encodeToString(stringJson.getBytes());
             log.info("Setting value for key: {}", key);
             jedis.set(key, jsonStringEncoded);
@@ -37,44 +37,34 @@ public class JedisClient {
         }
     }
 
-    public void setMenuData(Restaurant restaurant, ApiMenuData apiMenuData) throws JsonProcessingException {
+    public void setProducts(Restaurant restaurant, Set<NormalisedProduct> products) throws JsonProcessingException {
         // Store item with id = 0 where restaurant has no id
-        this.setMenuData(restaurant, 0, apiMenuData);
+        this.setProducts(restaurant, 0, products);
     }
 
-    public Optional<? extends ApiMenuData> getMenuData(Restaurant restaurant, int restaurantId) throws JsonProcessingException {
+    public Set<NormalisedProduct> getProducts(Restaurant restaurant, int restaurantId) throws JsonProcessingException {
         final String cacheKey = getCacheKey(restaurant, restaurantId);
         log.info("Getting stored menu data for key: {}", cacheKey);
         final String result = jedis.get(cacheKey);
 
         if (result == null) {
             log.info("Menu data for key: {} not present in cache", cacheKey);
-            return Optional.empty();
+            return Set.of();
         }
 
         try {
             final byte[] decodedBytes = Base64.getDecoder().decode(result);
             final String decodedJsonString = new String(decodedBytes);
-
-            switch (restaurant) {
-                case SPOONS -> {
-                    final SpoonsApiMenuData apiMenuData = objectMapper.readValue(decodedJsonString, SpoonsApiMenuData.class);
-                    return Optional.of(apiMenuData);
-                }
-                case NANDOS -> {
-                    final NandosApiMenuData apiMenuData = objectMapper.readValue(decodedJsonString, NandosApiMenuData.class);
-                    return Optional.of(apiMenuData);
-                }
-            }
+            return objectMapper.readValue(decodedJsonString, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             log.error("Failed to process menu data json");
             throw e;
         }
-        return Optional.empty();
     }
 
-    public Optional<? extends ApiMenuData> getMenuData(Restaurant restaurant) throws JsonProcessingException {
-        return getMenuData(restaurant, 0);
+    public Set<NormalisedProduct> getProducts(Restaurant restaurant) throws JsonProcessingException {
+        return getProducts(restaurant, 0);
     }
 
     private String getCacheKey(Restaurant restaurant, int restaurantId) {

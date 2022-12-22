@@ -19,4 +19,11 @@ public class NormalisedProduct {
         this.calories = calories;
         this.price = Math.round(price * 100);
     }
+
+    // for Jackson
+    public NormalisedProduct() {
+        this.name = "";
+        this.calories = 0;
+        this.price = 0;
+    }
 }
