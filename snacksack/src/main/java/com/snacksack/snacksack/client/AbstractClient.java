@@ -15,12 +15,13 @@ import java.util.Set;
  */
 public abstract class AbstractClient<T extends ApiMenuData> {
 
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper;
     protected final String baseEndpoint;
     protected final HttpClient client;
     protected final Normaliser<T> normaliser;
 
-    public AbstractClient(HttpClient client, String baseEndpoint, Normaliser<T> normaliser) {
+    public AbstractClient(ObjectMapper objectMapper, HttpClient client, String baseEndpoint, Normaliser<T> normaliser) {
+        this.objectMapper = objectMapper;
         this.baseEndpoint = baseEndpoint;
         this.client = client;
         this.normaliser = normaliser;

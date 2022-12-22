@@ -1,10 +1,9 @@
 package com.snacksack.snacksack.client;
 
-import com.snacksack.snacksack.dp.Solver;
-import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.helpers.Helpers;
 import com.snacksack.snacksack.model.NormalisedProduct;
-import com.snacksack.snacksack.model.answer.Answer;
+import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ class MenuClientTest {
         String responseJson = Helpers.readFileAsString("src/test/resources/menu-reduced.json");
         HttpClient httpClient = mock(HttpClient.class);
         HttpResponse httpResponse = mock(HttpResponse.class);
-        SpoonsClient menuClient = new SpoonsClient(httpClient);
+        SpoonsClient menuClient = new SpoonsClient(new ObjectMapper(), httpClient);
         URI uri = menuClient.constructURI(9);
 
         //and:
@@ -47,12 +46,12 @@ class MenuClientTest {
     }
 
     @Test
-    public void testSpoonsClientGet2() throws IOException, InterruptedException {
+    public void testSpoonsClientGetFullMenu() throws IOException, InterruptedException {
         //given:
         String responseJson = Helpers.readFileAsString("src/test/resources/menu.json");
         HttpClient httpClient = mock(HttpClient.class);
         HttpResponse httpResponse = mock(HttpResponse.class);
-        SpoonsClient menuClient = new SpoonsClient(httpClient);
+        SpoonsClient menuClient = new SpoonsClient(new ObjectMapper(), httpClient);
         URI uri = menuClient.constructURI(9);
 
         //and:
@@ -64,9 +63,25 @@ class MenuClientTest {
         SpoonsApiMenuData response = menuClient.getMenuResponse(uri);
 
         Set<NormalisedProduct> products = menuClient.getProducts(response);
-        Solver solver = new BottomUpSolver();
-        Answer answer = solver.solve(1811, products);
-        System.out.println(answer);
+    }
 
+    @Test
+    public void testNandosClientGetFullMenu() throws IOException, InterruptedException {
+        //given:
+        String responseJson = Helpers.readFileAsString("src/test/resources/nandos-menu.json");
+        HttpClient httpClient = mock(HttpClient.class);
+        HttpResponse httpResponse = mock(HttpResponse.class);
+        NandosClient menuClient = new NandosClient(new ObjectMapper(), httpClient);
+        URI uri = menuClient.constructURI();
+
+        //and:
+        when(httpClient.send(any(), any())).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseJson);
+
+        //when:
+        NandosApiMenuData response = menuClient.getMenuResponse(uri);
+        Set<NormalisedProduct> products = menuClient.getProducts(response);
+        assertThat(products.size(), is(equalTo(95)));
     }
 }
