@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import java.util.Base64;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -62,7 +61,8 @@ public class JedisClient {
         try {
             final byte[] decodedBytes = Base64.getDecoder().decode(result);
             final String decodedJsonString = new String(decodedBytes);
-            Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
+            Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {
+            });
             log.info("Returning {} results", results.size());
             return results;
         } catch (JsonProcessingException e) {

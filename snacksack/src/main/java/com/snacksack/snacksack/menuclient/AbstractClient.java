@@ -28,7 +28,6 @@ public abstract class AbstractClient<T extends ApiMenuData> {
     }
 
     /**
-     *
      * @param uri The URI (including any query params) used to fetch the menu JSON data
      * @return A subclass of ApiMenuData representing the parsed response
      * @throws HttpClientErrorException
@@ -36,7 +35,6 @@ public abstract class AbstractClient<T extends ApiMenuData> {
     abstract T getMenuResponse(URI uri) throws HttpClientErrorException;
 
     /**
-     *
      * @param apiMenuData A subclass of ApiMenuData representing the parsed menu data
      * @return A Set of NormalisedProduct, representing the normalised representation of
      * products contained in the menu data.

@@ -1,4 +1,3 @@
-
 package com.snacksack.snacksack.normaliser;
 
 import com.snacksack.snacksack.model.NormalisedProduct;
@@ -24,7 +23,7 @@ public class NandosNormaliser implements Normaliser<NandosApiMenuData> {
                 .getSections()
                 .stream().flatMap(section -> section.getItems().stream())
                 .filter(this::itemHasValues)
-                .filter(item -> !item.getNutritionalInfo().getFactsForPortionSizes().isEmpty() )
+                .filter(item -> !item.getNutritionalInfo().getFactsForPortionSizes().isEmpty())
                 .map(this::normalise)
                 .collect(Collectors.toSet());
 

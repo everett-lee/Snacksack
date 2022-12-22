@@ -15,7 +15,7 @@ public class MemMatrix {
 
         this.nRows = m;
         this.nCols = n;
-        this.matrix = new int [m][n];
+        this.matrix = new int[m][n];
     }
 
     private void checkCellInMatrix(int m, int n) {
@@ -74,7 +74,7 @@ public class MemMatrix {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder("");
-        for (int[] row: this.matrix) {
+        for (int[] row : this.matrix) {
             List<Integer> listedRow = Arrays.stream(row)
                     .boxed().toList();
 

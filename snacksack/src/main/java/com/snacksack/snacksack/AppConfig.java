@@ -1,10 +1,10 @@
 package com.snacksack.snacksack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.snacksack.snacksack.jedisclient.JedisClient;
 import com.snacksack.snacksack.menuclient.NandosClient;
 import com.snacksack.snacksack.menuclient.SpoonsClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
@@ -16,6 +16,14 @@ import java.time.Duration;
 @Slf4j
 public class AppConfig {
 
+    @Value("${redis.enabled}")
+    private boolean redisEnabled;
+
+    @Value("${redis.host}")
+    private String redisHost;
+
+    @Value("${redis.port}")
+    private int redisPort;
     static final ObjectMapper objectMapper = new ObjectMapper();
     static final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -38,12 +46,14 @@ public class AppConfig {
 
     @Bean
     public Jedis jedis() {
-        final String host = "localhost";
-        final int port = 6379;
-        final Jedis jedis = new Jedis(host, port);
+        if (!redisEnabled) {
+            return new Jedis();
+        }
+
+        final Jedis jedis = new Jedis(redisHost, redisPort);
 //        jedis.auth("password");
         jedis.get("abc");
-        log.info("Connected to Redis on host: {} and port: {}", host, port);
+        log.info("Connected to Redis on host: {} and port: {}", redisHost, redisPort);
         return jedis;
     }
 }

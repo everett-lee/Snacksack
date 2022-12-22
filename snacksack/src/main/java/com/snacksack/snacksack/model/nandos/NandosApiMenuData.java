@@ -12,6 +12,7 @@ public class NandosApiMenuData extends ApiMenuData {
     public NandosApiMenuData(MenuResponse menuResponse) {
         this.menuResponse = menuResponse;
     }
+
     public NandosApiMenuData() {
         this.menuResponse = new MenuResponse();
     }

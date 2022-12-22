@@ -21,6 +21,7 @@ class GlobalDefaultExceptionHandler {
                 .format(FAILURE_MESSAGE_TEMPLATE, e.getMessage()));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(InvalidMoneyException.class)
     @ResponseBody
     public ResponseEntity<ExceptionResponse> handleInvalidMoneyException(Exception e) {

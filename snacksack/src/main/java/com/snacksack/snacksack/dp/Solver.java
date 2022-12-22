@@ -15,7 +15,7 @@ public interface Solver {
      * a limit on money available.
      *
      * @param totalMoney money available to spend on products
-     * @param products products available to choose from
+     * @param products   products available to choose from
      * @return an answer containing total calories, total price and products
      * selected
      */

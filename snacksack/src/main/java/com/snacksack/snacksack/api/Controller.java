@@ -110,7 +110,8 @@ public class Controller {
     @PostConstruct
     public void initLocations() throws IOException {
         this.spoonsLocations = objectMapper
-                .readValue(locationsFile.getFile(), new TypeReference<>() {});
+                .readValue(locationsFile.getFile(), new TypeReference<>() {
+                });
         this.locationIDs = this.spoonsLocations.stream()
                 .map(SpoonsLocation::id).collect(Collectors.toSet());
     }
