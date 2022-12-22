@@ -40,8 +40,7 @@ class GlobalDefaultExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(String
-                .format(FAILURE_MESSAGE_TEMPLATE, e.getMessage()));
+        ExceptionResponse exceptionResponse = new ExceptionResponse("Internal server error");
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

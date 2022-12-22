@@ -49,12 +49,13 @@ public class Controller {
 
     @Autowired
     private ObjectMapper objectMapper;
+
     private List<SpoonsLocation> spoonsLocations;
     private Set<Integer> locationIDs;
 
-    private static final int THREADED_THRESHOLD = 750;
-    private static final int MONEY_MAX_VALUE = 50_000_00; // £50k
-    private static final double MONEY_MAX_VALUE_DOUBLE = MONEY_MAX_VALUE / 100.0; // £50k
+    private static final int THREADED_THRESHOLD_MONEY_PENCE = 750_00;
+    private static final int MONEY_MAX_VALUE_PENCE = 5_000_00; // £5k
+    private static final double MONEY_MAX_VALUE_POUNDS = MONEY_MAX_VALUE_PENCE / 100.0;
 
     @GetMapping("/snacksack/{restaurant}/")
     public Answer snacksack(
@@ -64,11 +65,11 @@ public class Controller {
     ) {
         final int selectedLocationId = locationId.orElse(-1);
         final String selectedRestaurant = restaurant.toUpperCase();
-        final int intMoney = (int) (money * 100);
+        final int moneyPence = (int) (money * 100);
 
-        if (money >= MONEY_MAX_VALUE) {
+        if (money >= MONEY_MAX_VALUE_POUNDS) {
             throw new InvalidLocationException(
-                    String.format("Elon doesn't need this app, provide a value below %s", MONEY_MAX_VALUE_DOUBLE)
+                    String.format("Elon doesn't need this app, provide a value below %s", MONEY_MAX_VALUE_POUNDS)
             );
         }
         if (money < 0) {
@@ -82,11 +83,11 @@ public class Controller {
             switch (parsedRestaurant) {
                 case SPOONS -> {
                     log.info("Solving for Spoons menu");
-                    return this.handleSpoonsRequest(intMoney, selectedLocationId);
+                    return this.handleSpoonsRequest(moneyPence, selectedLocationId);
                 }
                 case NANDOS -> {
                     log.info("Solving for Nandos menu");
-                    return this.handleNandosRequest(intMoney);
+                    return this.handleNandosRequest(moneyPence);
                 }
             }
 
@@ -102,33 +103,33 @@ public class Controller {
     }
 
     // TODO use strategy pattern
-    private Answer handleSpoonsRequest(int money, int locationId) {
+    private Answer handleSpoonsRequest(int moneyPence, int locationId) {
         if (!this.locationIDs.contains(locationId)) {
             throw new InvalidLocationException(String.format("%s not a a recognised location id", locationId));
         }
 
-        final URI uri = spoonsClient.constructURI(43);
+        final URI uri = spoonsClient.constructURI(locationId);
         final SpoonsApiMenuData menuResponse = spoonsClient.getMenuResponse(uri);
         final Set<NormalisedProduct> normalisedProducts = spoonsClient.getProducts(menuResponse);
 
-        if (money >= THREADED_THRESHOLD) {
+        if (moneyPence >= THREADED_THRESHOLD_MONEY_PENCE) {
             log.info("Large money parameter, using threaded version");
-            return bottomUpSolverThreaded.solve(money, normalisedProducts);
+            return bottomUpSolverThreaded.solve(moneyPence, normalisedProducts);
         } else {
-            return bottomUpSolver.solve(money, normalisedProducts);
+            return bottomUpSolver.solve(moneyPence, normalisedProducts);
         }
     }
 
-    private Answer handleNandosRequest(int money) {
+    private Answer handleNandosRequest(int moneyPence) {
         final URI uri = nandosClient.constructURI();
         final NandosApiMenuData menuResponse = nandosClient.getMenuResponse(uri);
         final Set<NormalisedProduct> normalisedProducts = nandosClient.getProducts(menuResponse);
 
-        if (money >= THREADED_THRESHOLD) {
+        if (moneyPence >= THREADED_THRESHOLD_MONEY_PENCE) {
             log.info("Large money parameter, using threaded version");
-            return bottomUpSolverThreaded.solve(money, normalisedProducts);
+            return bottomUpSolverThreaded.solve(moneyPence, normalisedProducts);
         } else {
-            return bottomUpSolver.solve(money, normalisedProducts);
+            return bottomUpSolver.solve(moneyPence, normalisedProducts);
         }
     }
 
