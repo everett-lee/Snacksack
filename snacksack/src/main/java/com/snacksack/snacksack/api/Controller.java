@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class Controller {
     @Value("classpath:spoons-locations.json")
     private Resource locationsFile;
+
     @Autowired
     private Solver bottomUpSolver;
 
