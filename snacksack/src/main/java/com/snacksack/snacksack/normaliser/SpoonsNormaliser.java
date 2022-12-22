@@ -5,12 +5,14 @@ import com.snacksack.snacksack.model.spoons.MenuResponse;
 import com.snacksack.snacksack.model.spoons.Product;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class SpoonsNormaliser implements Normaliser<SpoonsApiMenuData> {
     @Override
     public Set<NormalisedProduct> getNormalisedProducts(SpoonsApiMenuData apiMenuData) {

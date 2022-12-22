@@ -1,6 +1,7 @@
 package com.snacksack.snacksack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.snacksack.snacksack.jedisclient.JedisClient;
 import com.snacksack.snacksack.menuclient.NandosClient;
 import com.snacksack.snacksack.menuclient.SpoonsClient;
 import lombok.extern.slf4j.Slf4j;
@@ -24,22 +25,24 @@ public class AppConfig {
     public ObjectMapper objectMapper() {
         return objectMapper;
     }
+
     @Bean
-    public SpoonsClient spoonsClient(){
+    public SpoonsClient spoonsClient() {
         return new SpoonsClient(objectMapper, httpClient);
     }
 
     @Bean
-    public NandosClient nandosClient(){
+    public NandosClient nandosClient() {
         return new NandosClient(objectMapper, httpClient);
     }
 
     @Bean
-    public Jedis jedis(){
+    public Jedis jedis() {
         final String host = "localhost";
         final int port = 6379;
         final Jedis jedis = new Jedis(host, port);
 //        jedis.auth("password");
+        jedis.get("abc");
         log.info("Connected to Redis on host: {} and port: {}", host, port);
         return jedis;
     }

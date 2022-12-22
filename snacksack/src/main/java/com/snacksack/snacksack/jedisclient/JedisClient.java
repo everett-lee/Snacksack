@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import java.util.Base64;
@@ -13,11 +15,13 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
+@Service
 public class JedisClient {
+
     private final Jedis jedis;
     private final ObjectMapper objectMapper;
 
-    public JedisClient(Jedis jedis, ObjectMapper objectMapper) {
+    public JedisClient(@Autowired Jedis jedis, ObjectMapper objectMapper) {
         this.jedis = jedis;
         this.objectMapper = objectMapper;
     }
@@ -33,6 +37,9 @@ public class JedisClient {
             log.info("Key: {} set", key);
         } catch (JsonProcessingException e) {
             log.error("Exception writing menu data to JSON string");
+            throw e;
+        } catch (Exception e) {
+            log.error("Unhandled error {}", e.getMessage());
             throw e;
         }
     }
@@ -55,10 +62,14 @@ public class JedisClient {
         try {
             final byte[] decodedBytes = Base64.getDecoder().decode(result);
             final String decodedJsonString = new String(decodedBytes);
-            return objectMapper.readValue(decodedJsonString, new TypeReference<>() {
-            });
+            Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
+            log.info("Returning {} results", results.size());
+            return results;
         } catch (JsonProcessingException e) {
             log.error("Failed to process menu data json");
+            throw e;
+        } catch (Exception e) {
+            log.error("Unhandled error {}", e.getMessage());
             throw e;
         }
     }

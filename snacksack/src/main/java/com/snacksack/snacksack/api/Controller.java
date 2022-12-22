@@ -1,18 +1,16 @@
 package com.snacksack.snacksack.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
 import com.snacksack.snacksack.api.exceptions.RestaurantNotFoundException;
-import com.snacksack.snacksack.menuclient.NandosClient;
-import com.snacksack.snacksack.menuclient.SpoonsClient;
 import com.snacksack.snacksack.dp.Solver;
-import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
-import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
-import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import com.snacksack.snacksack.model.spoons.SpoonsLocation;
+import com.snacksack.snacksack.requesthandler.NandosRequestHandler;
+import com.snacksack.snacksack.requesthandler.SpoonsRequestHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,10 +39,10 @@ public class Controller {
     private Solver bottomUpSolverThreaded;
 
     @Autowired
-    private SpoonsClient spoonsClient;
+    private SpoonsRequestHandler spoonsRequestHandler;
 
     @Autowired
-    private NandosClient nandosClient;
+    private NandosRequestHandler nandosRequestHandler;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -83,54 +80,31 @@ public class Controller {
             switch (parsedRestaurant) {
                 case SPOONS -> {
                     log.info("Solving for Spoons menu");
-                    return this.handleSpoonsRequest(moneyPence, selectedLocationId);
+                    return spoonsRequestHandler
+                            .handleSpoonsRequest(moneyPence, selectedLocationId, THREADED_THRESHOLD_MONEY_PENCE);
                 }
                 case NANDOS -> {
                     log.info("Solving for Nandos menu");
-                    return this.handleNandosRequest(moneyPence);
+                    return nandosRequestHandler
+                            .handleNandosRequest(moneyPence, THREADED_THRESHOLD_MONEY_PENCE);
+                }
+                default -> {
+                    log.info("Unrecognised restaurant");
+                    return new Answer(0, List.of());
                 }
             }
 
         } catch (IllegalArgumentException e) {
             throw new RestaurantNotFoundException(String.format("%s is not a recognised restaurant", restaurant));
+        } catch (JsonProcessingException e) {
+            log.error("Error processing JSON {}", e.getMessage());
+            throw new RuntimeException(e);
         }
-        return new Answer(0, List.of());
     }
 
     @GetMapping("/location/spoons/")
     public List<SpoonsLocation> getPubs() {
         return spoonsLocations;
-    }
-
-    // TODO use strategy pattern
-    private Answer handleSpoonsRequest(int moneyPence, int locationId) {
-        if (!this.locationIDs.contains(locationId)) {
-            throw new InvalidLocationException(String.format("%s not a a recognised location id", locationId));
-        }
-
-        final URI uri = spoonsClient.constructURI(locationId);
-        final SpoonsApiMenuData menuResponse = spoonsClient.getMenuResponse(uri);
-        final Set<NormalisedProduct> normalisedProducts = spoonsClient.getProducts(menuResponse);
-
-        if (moneyPence >= THREADED_THRESHOLD_MONEY_PENCE) {
-            log.info("Large money parameter, using threaded version");
-            return bottomUpSolverThreaded.solve(moneyPence, normalisedProducts);
-        } else {
-            return bottomUpSolver.solve(moneyPence, normalisedProducts);
-        }
-    }
-
-    private Answer handleNandosRequest(int moneyPence) {
-        final URI uri = nandosClient.constructURI();
-        final NandosApiMenuData menuResponse = nandosClient.getMenuResponse(uri);
-        final Set<NormalisedProduct> normalisedProducts = nandosClient.getProducts(menuResponse);
-
-        if (moneyPence >= THREADED_THRESHOLD_MONEY_PENCE) {
-            log.info("Large money parameter, using threaded version");
-            return bottomUpSolverThreaded.solve(moneyPence, normalisedProducts);
-        } else {
-            return bottomUpSolver.solve(moneyPence, normalisedProducts);
-        }
     }
 
     @PostConstruct

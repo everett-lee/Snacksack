@@ -6,7 +6,7 @@ import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
 import com.snacksack.snacksack.dp.bottomUp.BottomUpSolverThreaded;
 import com.snacksack.snacksack.jedisclient.JedisClient;
-import com.snacksack.snacksack.menuclient.NandosClient;
+import com.snacksack.snacksack.menuclient.SpoonsClient;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
-class NandosRequestHandlerTest {
+class SpoonsRequestHandlerTest {
     @Spy
     protected Solver bottomUpSolver = new BottomUpSolver();
 
@@ -40,31 +40,36 @@ class NandosRequestHandlerTest {
     @Spy
     private NandosNormaliser normaliser = new NandosNormaliser();
     @Mock
-    protected JedisClient jedisClient ;
+    protected JedisClient jedisClient;
     @Mock
-    private NandosClient nandosClient;
+    private SpoonsClient spoonsClient;
     @InjectMocks
-    private NandosRequestHandler nandosRequestHandler;
+    private SpoonsRequestHandler spoonsRequestHandler;
+
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testCacheHit() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
-        when(jedisClient.getProducts(Restaurant.NANDOS)).thenReturn(products);
-        Answer answer = nandosRequestHandler.handleNandosRequest(55, 5000);
+        when(jedisClient.getProducts(Restaurant.SPOONS, 1)).thenReturn(products);
+        Answer answer = spoonsRequestHandler.handleSpoonsRequest(55, 1, 5000);
         assertThat(answer.getNormalisedProducts().size(), is(1));
         // Assert client was not used due to cache hit
-        verify(nandosClient, never()).constructURI();
+        verify(spoonsClient, never()).constructURI(1);
     }
 
     @Test
     public void testCacheMiss() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
-        when(jedisClient.getProducts(Restaurant.NANDOS)).thenReturn(Set.of());
-        when(nandosClient.getProducts(any())).thenReturn(products);
-        Answer answer = nandosRequestHandler.handleNandosRequest(55, 5000);
+        when(jedisClient.getProducts(Restaurant.SPOONS, 1)).thenReturn(Set.of());
+        when(spoonsClient.getProducts(any())).thenReturn(products);
+        Answer answer = spoonsRequestHandler.handleSpoonsRequest(55, 1, 5000);
         assertThat(answer.getNormalisedProducts().size(), is(1));
         // Assert jedis client invoked due to cache miss
-        verify(jedisClient, Mockito.times(1)).setProducts(Restaurant.NANDOS, products);
+        verify(jedisClient, Mockito.times(1)).setProducts(Restaurant.SPOONS, 1, products);
     }
 
 }

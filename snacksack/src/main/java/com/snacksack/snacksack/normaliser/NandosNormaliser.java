@@ -5,11 +5,13 @@ import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.nandos.Item;
 import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class NandosNormaliser implements Normaliser<NandosApiMenuData> {
     @Override
     public Set<NormalisedProduct> getNormalisedProducts(NandosApiMenuData apiMenuData) {
