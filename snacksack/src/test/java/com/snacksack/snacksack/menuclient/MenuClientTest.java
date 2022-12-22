@@ -1,4 +1,4 @@
-package com.snacksack.snacksack.client;
+package com.snacksack.snacksack.menuclient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.helpers.Helpers;

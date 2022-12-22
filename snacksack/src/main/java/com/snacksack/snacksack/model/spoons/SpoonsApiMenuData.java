@@ -10,4 +10,8 @@ public class SpoonsApiMenuData extends ApiMenuData {
     public SpoonsApiMenuData(MenuResponse menuResponse) {
         this.menuResponse = menuResponse;
     }
+
+    public SpoonsApiMenuData() {
+        this.menuResponse =  new MenuResponse();
+    }
 }

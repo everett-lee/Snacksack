@@ -1,4 +1,4 @@
-package com.snacksack.snacksack.client;
+package com.snacksack.snacksack.menuclient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.model.ApiMenuData;
@@ -11,7 +11,7 @@ import java.net.http.HttpClient;
 import java.util.Set;
 
 /**
- * Base class for the client used to fetch menu data and return a Set of products.
+ * Base class for the menuclient used to fetch menu data and return a Set of products.
  */
 public abstract class AbstractClient<T extends ApiMenuData> {
 

@@ -10,16 +10,15 @@ import java.util.concurrent.ForkJoinPool;
 @Service
 public class BottomUpSolverThreaded extends BottomUpSolver {
 
+    final int nProcessors = Runtime.getRuntime().availableProcessors();
     private final ForkJoinPool commonPool;
     private int threshold = 5_000;
 
     public BottomUpSolverThreaded() {
-        final int nProcessors = Runtime.getRuntime().availableProcessors();
         this.commonPool = new ForkJoinPool(nProcessors);
     }
 
     public BottomUpSolverThreaded(int threshold) {
-        int nProcessors = Runtime.getRuntime().availableProcessors();
         this.commonPool = new ForkJoinPool(nProcessors);
         this.threshold = threshold;
     }
