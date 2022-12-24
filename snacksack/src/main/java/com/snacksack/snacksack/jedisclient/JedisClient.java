@@ -79,6 +79,10 @@ public class JedisClient {
     }
 
     private String getCacheKey(Restaurant restaurant, int restaurantId) {
+        if (restaurant == null) {
+            throw new IllegalArgumentException("Restaurant cannot be null");
+        }
+        
         return String.format("%s_%s", restaurant, restaurantId);
     }
 

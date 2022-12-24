@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
+import com.snacksack.snacksack.api.exceptions.InvalidMoneyException;
 import com.snacksack.snacksack.api.exceptions.RestaurantNotFoundException;
 import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.model.Restaurant;
@@ -55,7 +56,7 @@ public class Controller {
     private static final int MONEY_MAX_VALUE_PENCE = 5_000_00; // £5k
     private static final double MONEY_MAX_VALUE_POUNDS = MONEY_MAX_VALUE_PENCE / 100.0;
 
-    @GetMapping("/snacksack/{restaurant}/")
+    @GetMapping("/snacksack/{restaurant}")
     public Answer snacksack(
             @PathVariable String restaurant,
             @RequestParam Optional<Integer> locationId,
@@ -70,9 +71,14 @@ public class Controller {
                     String.format("Elon doesn't need this app, provide a value below %s", MONEY_MAX_VALUE_POUNDS)
             );
         }
-        if (money < 0) {
-            throw new InvalidLocationException(
+        if (money <= 0) {
+            throw new InvalidMoneyException(
                     "Provide a positive money value"
+            );
+        }
+        if (selectedLocationId >=0 && !locationIDs.contains(selectedLocationId)) {
+            throw new InvalidLocationException(
+                    "Location id is not recognised"
             );
         }
 
@@ -103,7 +109,7 @@ public class Controller {
         }
     }
 
-    @GetMapping("/location/spoons/")
+    @GetMapping("/location/spoons")
     public List<SpoonsLocation> getPubs() {
         return spoonsLocations;
     }
@@ -111,7 +117,7 @@ public class Controller {
     @PostConstruct
     public void initLocations() throws IOException {
         this.spoonsLocations = objectMapper
-                .readValue(locationsFile.getFile(), new TypeReference<>() {
+                .readValue(locationsFile.getInputStream(), new TypeReference<>() {
                 });
         this.locationIDs = this.spoonsLocations.stream()
                 .map(SpoonsLocation::id).collect(Collectors.toSet());

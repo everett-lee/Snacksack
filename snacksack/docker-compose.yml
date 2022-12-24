@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  cache:
+    image: redis:7.0-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server
+  api:
+    container_name: app
+    build:
+      context: ./
+      args:
+        JAR_FILE: snacksack*SNAPSHOT.jar
+    image: snaksack
+#    restart: always
+    depends_on:
+      - cache
+    ports:
+      - '8080:8080'
+    links:
+      - cache

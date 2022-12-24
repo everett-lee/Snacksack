@@ -49,11 +49,11 @@ public class AppConfig {
         if (!redisEnabled) {
             return new Jedis();
         }
+        log.info("Connecting to Redis on host: {} and port: {}", redisHost, redisPort);
 
-        final Jedis jedis = new Jedis(redisHost, redisPort);
+        final Jedis jedis = new Jedis("cache", redisPort);
 //        jedis.auth("password");
         jedis.get("abc");
-        log.info("Connected to Redis on host: {} and port: {}", redisHost, redisPort);
         return jedis;
     }
 }
