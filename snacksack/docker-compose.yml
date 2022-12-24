@@ -13,7 +13,7 @@ services:
       args:
         JAR_FILE: snacksack*SNAPSHOT.jar
     image: snaksack
-#    restart: always
+    restart: always
     depends_on:
       - cache
     ports:
