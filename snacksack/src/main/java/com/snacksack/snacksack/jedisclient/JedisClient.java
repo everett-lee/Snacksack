@@ -37,7 +37,7 @@ public class JedisClient {
      * @throws JsonProcessingException
      */
     public void setProducts(Restaurant restaurant, int locationId, Set<NormalisedProduct> products) throws JsonProcessingException {
-        final String key = getCacheKey(restaurant, locationId);
+        final String key = this.getCacheKey(restaurant, locationId);
         final SetParams setParams = new SetParams();
         setParams.ex(YEAR_SECONDS);
 
@@ -82,8 +82,7 @@ public class JedisClient {
         try {
             final byte[] decodedBytes = Base64.getDecoder().decode(result);
             final String decodedJsonString = new String(decodedBytes);
-            Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {
-            });
+            final Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
             log.info("Returning {} results", results.size());
             return results;
         } catch (JsonProcessingException e) {

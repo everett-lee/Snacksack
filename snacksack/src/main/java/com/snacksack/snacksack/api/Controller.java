@@ -97,7 +97,7 @@ public class Controller {
     }
 
     @GetMapping("/location/greggs")
-    public List<Location> getPubs() {
+    public List<Location> getGreggsLocations() {
         return this.greggsRequestHandler.getLocations();
     }
 

@@ -6,18 +6,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ForkJoinPool;
 
-@Slf4j
-@Service
 /**
  * A multithreaded extension to the bottom up solver. The solutions to
  * the subproblems solved at each row - corresponding to an item being selected
  * and a money amount for that item - are dependent only on the solutions in the
  * previous row (and not on others in the same row). This means that the row can
  * be solved in parallel.
- * 
- * This class uses the Fork Join method defined in RecursiveRowUpdate to perform
+ *
+ * The class uses the Fork Join functionality defined in RecursiveRowUpdate to perform
  * the parallel computation.
  */
+@Slf4j
+@Service
 public class BottomUpSolverThreaded extends BottomUpSolver {
 
     final int nProcessors = Runtime.getRuntime().availableProcessors();

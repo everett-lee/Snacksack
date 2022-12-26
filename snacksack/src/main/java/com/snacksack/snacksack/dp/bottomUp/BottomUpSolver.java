@@ -43,8 +43,8 @@ public class BottomUpSolver implements Solver {
     }
 
     private void iterateMatrix(MemMatrix memMatrix, List<NormalisedProduct> products) {
-        long firstProductCost = products.get(0).getPrice();
-        int firstProductCalories = products.get(0).getCalories();
+        final long firstProductCost = products.get(0).getPrice();
+        final int firstProductCalories = products.get(0).getCalories();
 
         final int m = memMatrix.nRows;
         final int n = memMatrix.nCols;
@@ -61,8 +61,8 @@ public class BottomUpSolver implements Solver {
     }
 
     protected void iterateRow(int n, int i, MemMatrix memMatrix, NormalisedProduct product) {
-        long productCost = product.getPrice();
-        int productCalories = product.getCalories();
+        final long productCost = product.getPrice();
+        final int productCalories = product.getCalories();
 
         for (int money = 0; money < n; money++) {
             // The item was not taken, use previous solution
