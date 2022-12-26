@@ -27,7 +27,7 @@ public class AppConfig {
     private int redisPort;
 
     static final ObjectMapper objectMapper = new ObjectMapper();
-    
+
     static final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
