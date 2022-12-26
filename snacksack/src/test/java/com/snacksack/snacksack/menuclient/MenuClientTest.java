@@ -3,6 +3,7 @@ package com.snacksack.snacksack.menuclient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.helpers.Helpers;
 import com.snacksack.snacksack.model.NormalisedProduct;
+import com.snacksack.snacksack.model.greggs.GreggsApiMenuData;
 import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,7 @@ import java.net.http.HttpResponse;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -83,5 +83,27 @@ class MenuClientTest {
         NandosApiMenuData response = menuClient.getMenuResponse(uri);
         Set<NormalisedProduct> products = menuClient.getProducts(response);
         assertThat(products.size(), is(equalTo(95)));
+    }
+
+    @Test
+    public void testGreggsClientGet() throws IOException, InterruptedException {
+        //given:
+        String responseJson = Helpers.readFileAsString("src/test/resources/greggs-menu.json");
+        HttpClient httpClient = mock(HttpClient.class);
+        HttpResponse httpResponse = mock(HttpResponse.class);
+        GreggsClient menuClient = new GreggsClient(new ObjectMapper(), httpClient);
+        URI uri = menuClient.constructURI(9);
+
+        //and:
+        when(httpClient.send(any(), any())).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseJson);
+
+        //when:
+        GreggsApiMenuData response = menuClient.getMenuResponse(uri);
+
+        //then:
+        Set<NormalisedProduct> products = menuClient.getProducts(response);
+        assertThat(products.size(), is(greaterThan(0)));
     }
 }

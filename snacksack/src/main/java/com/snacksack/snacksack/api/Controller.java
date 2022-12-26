@@ -1,38 +1,29 @@
 package com.snacksack.snacksack.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
 import com.snacksack.snacksack.api.exceptions.InvalidMoneyException;
 import com.snacksack.snacksack.api.exceptions.RestaurantNotFoundException;
 import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
-import com.snacksack.snacksack.model.spoons.SpoonsLocation;
+import com.snacksack.snacksack.model.Location;
+import com.snacksack.snacksack.requesthandler.GreggsRequestHandler;
 import com.snacksack.snacksack.requesthandler.NandosRequestHandler;
 import com.snacksack.snacksack.requesthandler.SpoonsRequestHandler;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
 public class Controller {
-    @Value("classpath:spoons-locations.json")
-    private Resource locationsFile;
 
     @Autowired
     private Solver bottomUpSolver;
@@ -41,16 +32,13 @@ public class Controller {
     private Solver bottomUpSolverThreaded;
 
     @Autowired
-    private SpoonsRequestHandler spoonsRequestHandler;
+    private GreggsRequestHandler greggsRequestHandler;
 
     @Autowired
     private NandosRequestHandler nandosRequestHandler;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    private List<SpoonsLocation> spoonsLocations;
-    private Set<Integer> locationIDs;
+    private SpoonsRequestHandler spoonsRequestHandler;
 
     private static final int THREADED_THRESHOLD_MONEY_PENCE = 750_00;
     private static final int MONEY_MAX_VALUE_PENCE = 5_000_00; // £5k
@@ -76,23 +64,18 @@ public class Controller {
                     "Provide a positive money value"
             );
         }
-        if (selectedLocationId >=0 && !locationIDs.contains(selectedLocationId)) {
-            throw new InvalidLocationException(
-                    "Location id is not recognised"
-            );
-        }
 
         try {
             final Restaurant parsedRestaurant = Restaurant.valueOf(selectedRestaurant);
             switch (parsedRestaurant) {
                 case SPOONS -> {
                     log.info("Solving for Spoons menu");
-                    return spoonsRequestHandler
+                    return this.spoonsRequestHandler
                             .handleSpoonsRequest(moneyPence, selectedLocationId, THREADED_THRESHOLD_MONEY_PENCE);
                 }
                 case NANDOS -> {
                     log.info("Solving for Nandos menu");
-                    return nandosRequestHandler
+                    return this.nandosRequestHandler
                             .handleNandosRequest(moneyPence, THREADED_THRESHOLD_MONEY_PENCE);
                 }
                 default -> {
@@ -109,17 +92,9 @@ public class Controller {
         }
     }
 
-    @GetMapping("/location/spoons")
-    public List<SpoonsLocation> getPubs() {
-        return spoonsLocations;
+    @GetMapping("/location/greggs")
+    public List<Location> getPubs() {
+        return this.greggsRequestHandler.getLocations();
     }
 
-    @PostConstruct
-    public void initLocations() throws IOException {
-        this.spoonsLocations = objectMapper
-                .readValue(locationsFile.getInputStream(), new TypeReference<>() {
-                });
-        this.locationIDs = this.spoonsLocations.stream()
-                .map(SpoonsLocation::id).collect(Collectors.toSet());
-    }
 }

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.SetParams;
 
 import java.util.Base64;
 import java.util.Set;
@@ -20,19 +21,31 @@ public class JedisClient {
     private final Jedis jedis;
     private final ObjectMapper objectMapper;
 
+    private final int YEAR_SECONDS = 60 * 60 * 24 * 365;
+
     public JedisClient(@Autowired Jedis jedis, ObjectMapper objectMapper) {
         this.jedis = jedis;
         this.objectMapper = objectMapper;
     }
 
-    public void setProducts(Restaurant restaurant, int restaurantId, Set<NormalisedProduct> products) throws JsonProcessingException {
-        final String key = getCacheKey(restaurant, restaurantId);
+    /**
+     * Set the encoded JSON data for a given restaurant and restaurant id
+     *
+     * @param restaurant Enum representing the restaurant
+     * @param locationId Id corresponding to restaurant location
+     * @param products   A Set of products contained in the restaurant menu
+     * @throws JsonProcessingException
+     */
+    public void setProducts(Restaurant restaurant, int locationId, Set<NormalisedProduct> products) throws JsonProcessingException {
+        final String key = getCacheKey(restaurant, locationId);
+        final SetParams setParams = new SetParams();
+        setParams.ex(YEAR_SECONDS);
 
         try {
             final String stringJson = objectMapper.writeValueAsString(products);
             final String jsonStringEncoded = Base64.getEncoder().encodeToString(stringJson.getBytes());
             log.info("Setting value for key: {}", key);
-            jedis.set(key, jsonStringEncoded);
+            jedis.set(key, jsonStringEncoded, setParams);
             log.info("Key: {} set", key);
         } catch (JsonProcessingException e) {
             log.error("Exception writing menu data to JSON string");
@@ -48,8 +61,16 @@ public class JedisClient {
         this.setProducts(restaurant, 0, products);
     }
 
-    public Set<NormalisedProduct> getProducts(Restaurant restaurant, int restaurantId) throws JsonProcessingException {
-        final String cacheKey = getCacheKey(restaurant, restaurantId);
+    /**
+     * Get products for a given restaurant and location ID
+     *
+     * @param restaurant Enum representing the restaurant
+     * @param locationId Id corresponding to restaurant location
+     * @return A Set of products contained in the restaurant menu
+     * @throws JsonProcessingException
+     */
+    public Set<NormalisedProduct> getProducts(Restaurant restaurant, int locationId) throws JsonProcessingException {
+        final String cacheKey = getCacheKey(restaurant, locationId);
         log.info("Getting stored menu data for key: {}", cacheKey);
         final String result = jedis.get(cacheKey);
 
@@ -75,6 +96,7 @@ public class JedisClient {
     }
 
     public Set<NormalisedProduct> getProducts(Restaurant restaurant) throws JsonProcessingException {
+        // Item stored with id = 0 as default
         return getProducts(restaurant, 0);
     }
 
@@ -82,7 +104,7 @@ public class JedisClient {
         if (restaurant == null) {
             throw new IllegalArgumentException("Restaurant cannot be null");
         }
-        
+
         return String.format("%s_%s", restaurant, restaurantId);
     }
 

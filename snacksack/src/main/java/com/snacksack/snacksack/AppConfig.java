@@ -1,6 +1,7 @@
 package com.snacksack.snacksack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.snacksack.snacksack.menuclient.GreggsClient;
 import com.snacksack.snacksack.menuclient.NandosClient;
 import com.snacksack.snacksack.menuclient.SpoonsClient;
 import lombok.extern.slf4j.Slf4j;
@@ -45,13 +46,18 @@ public class AppConfig {
     }
 
     @Bean
+    public GreggsClient greggsClient() {
+        return new GreggsClient(objectMapper, httpClient);
+    }
+
+    @Bean
     public Jedis jedis() {
         if (!redisEnabled) {
             return new Jedis();
         }
         log.info("Connecting to Redis on host: {} and port: {}", redisHost, redisPort);
 
-        final Jedis jedis = new Jedis("cache", redisPort);
+        final Jedis jedis = new Jedis(redisHost, redisPort);
 //        jedis.auth("password");
         jedis.get("abc");
         return jedis;

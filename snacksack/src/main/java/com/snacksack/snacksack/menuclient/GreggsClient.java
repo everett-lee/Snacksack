@@ -1,10 +1,11 @@
 package com.snacksack.snacksack.menuclient;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.model.NormalisedProduct;
-import com.snacksack.snacksack.model.spoons.MenuResponse;
-import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
-import com.snacksack.snacksack.normaliser.SpoonsNormaliser;
+import com.snacksack.snacksack.model.greggs.GreggsApiMenuData;
+import com.snacksack.snacksack.model.greggs.MenuItem;
+import com.snacksack.snacksack.normaliser.GreggsNormaliser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,19 +24,18 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 
 @Slf4j
-public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
-    public SpoonsClient(ObjectMapper objectMapper, HttpClient client) {
+public class GreggsClient extends AbstractClient<GreggsApiMenuData> {
+    public GreggsClient(ObjectMapper objectMapper, HttpClient client) {
         super(
                 objectMapper,
                 client,
-                // Fake endpoint for now
-                "https://www.example.com/{locationId}",
-                new SpoonsNormaliser()
+                "https://production-digital.greggs.co.uk/api/v1.0/articles/shop/{locationId}",
+                new GreggsNormaliser()
         );
     }
 
     @Override
-    public SpoonsApiMenuData getMenuResponse(URI uri) throws HttpClientErrorException {
+    public GreggsApiMenuData getMenuResponse(URI uri) throws HttpClientErrorException {
         HttpRequest request = HttpRequest.newBuilder()
                 .timeout(Duration.of(10, SECONDS))
                 .uri(uri)
@@ -48,9 +49,10 @@ public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
                 log.error("Request failed with response code {}", res.statusCode());
                 throw new RuntimeException();
             }
-            final MenuResponse menuResponse = objectMapper.readValue(res.body(), MenuResponse.class);
+            final List<MenuItem> menuItems = objectMapper.readValue(res.body(), new TypeReference<>() {
+            });
             log.info("Data fetched");
-            return new SpoonsApiMenuData(menuResponse);
+            return new GreggsApiMenuData(menuItems);
         } catch (HttpClientErrorException e) {
             log.error("Failed to GET menu response. Returned status: {}", e.getStatusCode());
             throw e;
@@ -72,7 +74,7 @@ public class SpoonsClient extends AbstractClient<SpoonsApiMenuData> {
     }
 
     @Override
-    public Set<NormalisedProduct> getProducts(SpoonsApiMenuData apiMenuData) {
+    public Set<NormalisedProduct> getProducts(GreggsApiMenuData apiMenuData) {
         return this.normaliser.getNormalisedProducts(apiMenuData);
     }
 }

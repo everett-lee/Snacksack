@@ -7,6 +7,13 @@ import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
+/**
+ * Recursively splits the subproblems for a given row of the matrix,
+ * corresponding to a single product, until the threshold is reached.
+ *
+ * When the threshold is reached the row is iterated on to find solutions
+ * for the cells in range [start,finish].
+ */
 public class RecursiveRowUpdate extends RecursiveAction {
     private final MemMatrix memMatrix;
     private final int threshold;
@@ -40,6 +47,10 @@ public class RecursiveRowUpdate extends RecursiveAction {
         }
     }
 
+    /**
+     * Keep halving the range until threshold is reached
+     * @return a list of RecursiveRowUpdate
+     */
     private List<RecursiveRowUpdate> createSubtasks() {
         final List<RecursiveRowUpdate> subtasks = new ArrayList<>();
         final int midPoint = this.start + (this.finish - this.start) / 2;
@@ -50,6 +61,9 @@ public class RecursiveRowUpdate extends RecursiveAction {
         return subtasks;
     }
 
+    /**
+     * Perform the updates on indexes in the range [start,finish]
+     */
     private void process() {
         final long productCost = normalisedProduct.getPrice();
         final int productCalories = normalisedProduct.getCalories();

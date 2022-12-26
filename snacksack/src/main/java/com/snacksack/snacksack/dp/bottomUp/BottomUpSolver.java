@@ -65,16 +65,34 @@ public class BottomUpSolver implements Solver {
         int productCalories = product.getCalories();
 
         for (int money = 0; money < n; money++) {
+            // The item was not taken, use previous solution
+            int leave = memMatrix.getCell(i - 1, money);
+
             if (money < productCost) {
-                memMatrix.setCell(i, money, memMatrix.getCell(i - 1, money));
+                memMatrix.setCell(i, money, leave);
             } else {
+                // The item was taken, add its calories to total and deduct its cost
                 int take = productCalories + memMatrix.getCell(i - 1, money - productCost);
-                int leave = memMatrix.getCell(i - 1, money);
+                // Solution here is highest of take and leave branches
                 memMatrix.setCell(i, money, Math.max(take, leave));
             }
         }
     }
 
+    /**
+     * The solve method above will find the maximum calories for a given
+     * money amount, but will not specify which items are selected to reach
+     * that result.
+     *
+     * This method takes the completed matrix of solutions and iterates 'backwards'
+     * from the cell containing the final solution to determine the items (corresponding
+     * to row indexes) that compose the answer.
+     *
+     * @param memMatrix a matrix filled with subproblem solutions
+     * @param products the list of products used to complete the marix
+     * @param answer the answer in the form of max calories for the given products and money
+     * @return a List of products used to product the answer
+     */
     private List<NormalisedProduct> getAnswerProducts(MemMatrix memMatrix, List<NormalisedProduct> products, int answer) {
         final List<NormalisedProduct> answerProducts = new ArrayList<>();
         int i = memMatrix.nRows - 1;

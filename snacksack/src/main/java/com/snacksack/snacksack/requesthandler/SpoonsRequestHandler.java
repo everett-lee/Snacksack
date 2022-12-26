@@ -23,7 +23,6 @@ public class SpoonsRequestHandler extends BaseRequestHandler {
     @Autowired
     private SpoonsNormaliser normaliser;
 
-
     public Answer handleSpoonsRequest(int moneyPence, int restaurantId, int threadedThreshold) throws JsonProcessingException {
         final Set<NormalisedProduct> normalisedProducts = getProducts(restaurantId);
         return this.getAnswer(moneyPence, threadedThreshold, normalisedProducts);
