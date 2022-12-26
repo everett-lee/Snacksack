@@ -92,7 +92,7 @@ class MenuClientTest {
         HttpClient httpClient = mock(HttpClient.class);
         HttpResponse httpResponse = mock(HttpResponse.class);
         GreggsClient menuClient = new GreggsClient(new ObjectMapper(), httpClient);
-        URI uri = menuClient.constructURI(9);
+        URI uri = menuClient.constructURI(92);
 
         //and:
         when(httpClient.send(any(), any())).thenReturn(httpResponse);
@@ -103,6 +103,7 @@ class MenuClientTest {
         GreggsApiMenuData response = menuClient.getMenuResponse(uri);
 
         //then:
+        assertThat(uri.toString(), is(equalTo("https://production-digital.greggs.co.uk/api/v1.0/articles/shop/0092")));
         Set<NormalisedProduct> products = menuClient.getProducts(response);
         assertThat(products.size(), is(greaterThan(0)));
     }

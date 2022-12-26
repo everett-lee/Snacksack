@@ -65,8 +65,19 @@ public class GreggsClient extends AbstractClient<GreggsApiMenuData> {
 
 
     public URI constructURI(int locationId) {
-        final Map<String, Integer> pathVars = Map.of(
-                "locationId", locationId
+        log.info("Padding locationId: {}", locationId);
+        // convert int locationID to string with padding
+        int expectedStringLength = 4;
+        final StringBuilder locationString = new StringBuilder(String.valueOf(locationId));
+        int paddingChars = expectedStringLength - locationString.length();
+
+        while (paddingChars > 0) {
+            locationString.insert(0, "0");
+            paddingChars--;
+        }
+
+        final Map<String, String> pathVars = Map.of(
+                "locationId", locationString.toString()
         );
 
         final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(this.baseEndpoint);

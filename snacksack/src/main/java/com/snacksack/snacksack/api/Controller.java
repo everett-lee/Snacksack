@@ -1,13 +1,14 @@
 package com.snacksack.snacksack.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.snacksack.snacksack.api.exceptions.DeprecatedRestaurantException;
 import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
 import com.snacksack.snacksack.api.exceptions.InvalidMoneyException;
 import com.snacksack.snacksack.api.exceptions.RestaurantNotFoundException;
 import com.snacksack.snacksack.dp.Solver;
+import com.snacksack.snacksack.model.greggs.Location;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
-import com.snacksack.snacksack.model.Location;
 import com.snacksack.snacksack.requesthandler.GreggsRequestHandler;
 import com.snacksack.snacksack.requesthandler.NandosRequestHandler;
 import com.snacksack.snacksack.requesthandler.SpoonsRequestHandler;
@@ -68,15 +69,18 @@ public class Controller {
         try {
             final Restaurant parsedRestaurant = Restaurant.valueOf(selectedRestaurant);
             switch (parsedRestaurant) {
-                case SPOONS -> {
-                    log.info("Solving for Spoons menu");
-                    return this.spoonsRequestHandler
-                            .handleSpoonsRequest(moneyPence, selectedLocationId, THREADED_THRESHOLD_MONEY_PENCE);
+                case GREGGS -> {
+                    log.info("Solving for Greggs menu");
+                    return this.greggsRequestHandler
+                            .handleGreggsRequest(moneyPence, selectedLocationId, THREADED_THRESHOLD_MONEY_PENCE);
                 }
                 case NANDOS -> {
                     log.info("Solving for Nandos menu");
                     return this.nandosRequestHandler
                             .handleNandosRequest(moneyPence, THREADED_THRESHOLD_MONEY_PENCE);
+                }
+                case SPOONS -> {
+                    throw new DeprecatedRestaurantException("Spoons not currently supported");
                 }
                 default -> {
                     log.info("Unrecognised restaurant");

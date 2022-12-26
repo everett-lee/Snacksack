@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
 import com.snacksack.snacksack.menuclient.GreggsClient;
-import com.snacksack.snacksack.model.Location;
+import com.snacksack.snacksack.model.greggs.Location;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
@@ -45,9 +45,9 @@ public class GreggsRequestHandler extends BaseRequestHandler {
 
     private Set<NormalisedProduct> getProducts(int locationId) throws JsonProcessingException {
         if (!this.getLocationIDs().contains(locationId)) {
-            throw new InvalidLocationException(
-                    "Location id is not recognised"
-            );
+            final String msg = String.format("Location id %s is not recognised", locationId);
+            log.error(msg);
+            throw new InvalidLocationException(msg);
         }
 
         final Set<NormalisedProduct> products = jedisClient

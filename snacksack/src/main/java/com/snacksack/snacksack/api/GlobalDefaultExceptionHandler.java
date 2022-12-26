@@ -1,9 +1,6 @@
 package com.snacksack.snacksack.api;
 
-import com.snacksack.snacksack.api.exceptions.ExceptionResponse;
-import com.snacksack.snacksack.api.exceptions.InvalidLocationException;
-import com.snacksack.snacksack.api.exceptions.InvalidMoneyException;
-import com.snacksack.snacksack.api.exceptions.RestaurantNotFoundException;
+import com.snacksack.snacksack.api.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -34,6 +31,14 @@ class GlobalDefaultExceptionHandler {
     @ExceptionHandler(InvalidLocationException.class)
     @ResponseBody
     public ResponseEntity<ExceptionResponse> handleInvalidLocationException(Exception e) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(String
+                .format(FAILURE_MESSAGE_TEMPLATE, e.getMessage()));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DeprecatedRestaurantException.class)
+    @ResponseBody
+    public ResponseEntity<ExceptionResponse> deprecatedRestaurantExceptionResponseEntity(Exception e) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(String
                 .format(FAILURE_MESSAGE_TEMPLATE, e.getMessage()));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
