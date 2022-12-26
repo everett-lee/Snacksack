@@ -5,7 +5,7 @@ services:
     restart: always
     ports:
       - '6379:6379'
-    command: redis-server
+    command: redis-server --requirepass DEV_PASS
   api:
     container_name: app
     build:
@@ -14,11 +14,10 @@ services:
         JAR_FILE: snacksack*SNAPSHOT.jar
     environment:
       SPRING_PROFILES_ACTIVE: local-dev
+      REDIS_PASS: DEV_PASS
     image: snaksack
     restart: always
     depends_on:
       - cache
     ports:
       - '8080:8080'
-    links:
-      - cache

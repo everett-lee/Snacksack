@@ -26,6 +26,9 @@ public class AppConfig {
     @Value("${redis.port}")
     private int redisPort;
 
+    @Value("#{environment.REDIS_PASS}")
+    private String redisPass;
+
     static final ObjectMapper objectMapper = new ObjectMapper();
 
     static final HttpClient httpClient = HttpClient.newBuilder()
@@ -60,8 +63,8 @@ public class AppConfig {
         log.info("Connecting to Redis on host: {} and port: {}", redisHost, redisPort);
 
         final Jedis jedis = new Jedis(redisHost, redisPort);
-//        jedis.auth("password");
-        jedis.get("abc");
+        jedis.auth(redisPass);
+        jedis.get("fake_key");
         return jedis;
     }
 }
