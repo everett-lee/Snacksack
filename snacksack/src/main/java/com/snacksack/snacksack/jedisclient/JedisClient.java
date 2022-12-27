@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
 import java.util.Base64;
@@ -18,13 +19,13 @@ import java.util.Set;
 @Service
 public class JedisClient {
 
-    private final Jedis jedis;
+    private final JedisPool jedisPool;
     private final ObjectMapper objectMapper;
 
     private final int YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-    public JedisClient(@Autowired Jedis jedis, ObjectMapper objectMapper) {
-        this.jedis = jedis;
+    public JedisClient(@Autowired JedisPool jedisPool, ObjectMapper objectMapper) {
+        this.jedisPool = jedisPool;
         this.objectMapper = objectMapper;
     }
 
@@ -45,7 +46,11 @@ public class JedisClient {
             final String stringJson = objectMapper.writeValueAsString(products);
             final String jsonStringEncoded = Base64.getEncoder().encodeToString(stringJson.getBytes());
             log.info("Setting value for key: {}", key);
-            jedis.set(key, jsonStringEncoded, setParams);
+
+            try (Jedis jedis = jedisPool.getResource()){
+                jedis.set(key, jsonStringEncoded);
+            }
+
             log.info("Key: {} set", key);
         } catch (JsonProcessingException e) {
             log.error("Exception writing menu data to JSON string");
@@ -72,25 +77,28 @@ public class JedisClient {
     public Set<NormalisedProduct> getProducts(Restaurant restaurant, int locationId) throws JsonProcessingException {
         final String cacheKey = getCacheKey(restaurant, locationId);
         log.info("Getting stored menu data for key: {}", cacheKey);
-        final String result = jedis.get(cacheKey);
 
-        if (result == null) {
-            log.info("Menu data for key: {} not present in cache", cacheKey);
-            return Set.of();
-        }
+        try (Jedis jedis = jedisPool.getResource()){
+            String result = jedis.get(cacheKey);
 
-        try {
-            final byte[] decodedBytes = Base64.getDecoder().decode(result);
-            final String decodedJsonString = new String(decodedBytes);
-            final Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
-            log.info("Returning {} results", results.size());
-            return results;
-        } catch (JsonProcessingException e) {
-            log.error("Failed to process menu data json");
-            throw e;
-        } catch (Exception e) {
-            log.error("Unhandled error {}", e.getMessage());
-            throw e;
+            if (result == null) {
+                log.info("Menu data for key: {} not present in cache", cacheKey);
+                return Set.of();
+            }
+
+            try {
+                final byte[] decodedBytes = Base64.getDecoder().decode(result);
+                final String decodedJsonString = new String(decodedBytes);
+                final Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
+                log.info("Returning {} results", results.size());
+                return results;
+            } catch (JsonProcessingException e) {
+                log.error("Failed to process menu data json");
+                throw e;
+            } catch (Exception e) {
+                log.error("Unhandled error {}", e.getMessage());
+                throw e;
+            }
         }
     }
 

@@ -15,7 +15,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.IOException;
 import java.net.URI;
@@ -37,7 +38,7 @@ class JedisClientTest {
     public static final GenericContainer REDIS = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
             .withExposedPorts(6379);
 
-    public static Jedis JEDIS;
+    public static JedisPool JEDIS_POOL;
     public static JedisClient JEDIS_CLIENT;
 
     static {
@@ -47,8 +48,9 @@ class JedisClientTest {
 
     @BeforeAll()
     public static void setUp() throws InterruptedException {
-        JEDIS = new Jedis(REDIS.getHost(), REDIS.getFirstMappedPort());
-        JEDIS_CLIENT = new JedisClient(JEDIS, new ObjectMapper());
+        final JedisPoolConfig poolConfig = new JedisPoolConfig();
+        JEDIS_POOL = new JedisPool(poolConfig, REDIS.getHost(), REDIS.getFirstMappedPort());
+        JEDIS_CLIENT = new JedisClient(JEDIS_POOL, new ObjectMapper());
     }
 
     @Test
@@ -68,8 +70,10 @@ class JedisClientTest {
         //when:
         NandosApiMenuData response = menuClient.getMenuResponse(uri);
         JEDIS_CLIENT.setProducts(Restaurant.NANDOS, menuClient.getProducts(response));
-        final Set<NormalisedProduct> products = JEDIS_CLIENT
+
+        Set<NormalisedProduct> products = JEDIS_CLIENT
                 .getProducts(Restaurant.NANDOS);
+
 
         assertThat(products, is(notNullValue()));
         assertThat(products.size(), greaterThan(0));

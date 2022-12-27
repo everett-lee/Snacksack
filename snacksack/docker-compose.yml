@@ -14,7 +14,7 @@ services:
         JAR_FILE: snacksack*SNAPSHOT.jar
     environment:
       SPRING_PROFILES_ACTIVE: local-dev
-      REDIS_PASS: DEV_PASS
+      REDIS_URL: redis://:DEV_PASS@cache:6379
     image: snaksack
     restart: always
     depends_on:
