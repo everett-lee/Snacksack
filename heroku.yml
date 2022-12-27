@@ -3,3 +3,4 @@ build:
     web: ./snacksack/Dockerfile
   config:
     JAR_FILE: snacksack*SNAPSHOT.jar
+    JAVA_OPTIONS: "-Xms256m -Xmx416m -Xss512k -XX:+UseContainerSupport"
