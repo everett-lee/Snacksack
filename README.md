@@ -25,7 +25,7 @@ Get the maximum calories for a money amount of £33.33 at Greggs location with i
 The app is deployed with Spring Boot running as a Docker image with an attached Redis cache. 
 
 The app treats finding maximum calories as a version of the '0 1 knapsack problem' - so assumes 
-each item is purchased only once - and uses the bottom up 'dynamic programming' approach to finding
+each item is purchased only once - and uses the bottom up 'dynamic programming' approach to produce 
 an answer.
 
 The money parameter (weight in the standard knapsack problem) is converted to pence, resulting
