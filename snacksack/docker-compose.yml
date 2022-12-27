@@ -11,8 +11,8 @@ services:
     build:
       context: ./
       args:
+        CUSTOM_OPTIONS: "-Xmx400m -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
         JAR_FILE: "snacksack*SNAPSHOT.jar"
-        JAVA_OPTIONS: "-Xms256m -Xmx416m -Xss512k -XX:+UseContainerSupport"
     environment:
       SPRING_PROFILES_ACTIVE: local-dev
       REDIS_URL: redis://:DEV_PASS@cache:6379
