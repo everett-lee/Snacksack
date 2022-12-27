@@ -1,0 +1,5 @@
+build:
+  docker:
+    web: ./snacksack/Dockerfile
+  config:
+    JAR_FILE: snacksack*SNAPSHOT.jar
