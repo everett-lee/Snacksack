@@ -1,7 +1,7 @@
 <h2> Snacksack App </h2>
 
-App for the commonplace problem of finding the maximum pound-per-calorie menu 
-options. Fine dining institutions Nandos and Greggs are currently supported.
+App for the commonplace problem of finding the maximum pence-per-calorie menu 
+options at popular restaurants. Fine dining institutions Nandos and Greggs are currently supported.
 
 <h3> Usage </h3>
 
