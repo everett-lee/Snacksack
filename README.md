@@ -33,5 +33,5 @@ in many columns in the solution matrix for large values. A multithreaded approac
 problem is used in such cases.
 
 The menu data is fetched from the restaurant API. This is converted into a normalised set of products
-as input to the solver. To avoid re-fetching data these normamlised products are stored in the 
-Redis cache. Answers for a given restaurant_locationId_money triplet are also stored in the cache.
+as input to the solver. To avoid re-fetching data these, normalised products are stored in the 
+Redis cache. Answers for a given `restaurant_locationId_money` triplet are also stored in the cache.
