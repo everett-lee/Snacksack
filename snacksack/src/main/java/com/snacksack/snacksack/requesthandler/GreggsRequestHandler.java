@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class GreggsRequestHandler extends BaseRequestHandler {
     @Value("classpath:greggs-locations.json")
     private Resource locationsFile;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -39,8 +40,16 @@ public class GreggsRequestHandler extends BaseRequestHandler {
     private Set<Integer> locationIDs;
 
     public Answer handleGreggsRequest(int moneyPence, int locationId, int threadedThreshold) throws JsonProcessingException {
+        final Answer cachedAnswer = this.jedisClient.getAnswer(Restaurant.GREGGS, locationId, moneyPence);
+        if (cachedAnswer.totalCalories != -1) {
+            log.info("Cached answer present, returning value");
+            return cachedAnswer;
+        }
+
         final Set<NormalisedProduct> normalisedProducts = getProducts(locationId);
-        return this.getAnswer(moneyPence, threadedThreshold, normalisedProducts);
+        final Answer answer = this.getAnswer(moneyPence, threadedThreshold, normalisedProducts);
+        this.jedisClient.setAnswer(Restaurant.GREGGS, locationId, moneyPence, answer);
+        return answer;
     }
 
     private Set<NormalisedProduct> getProducts(int locationId) throws JsonProcessingException {

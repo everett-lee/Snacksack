@@ -11,7 +11,6 @@ import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
 import com.snacksack.snacksack.model.answer.Answer;
 import com.snacksack.snacksack.normaliser.NandosNormaliser;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -19,6 +18,7 @@ import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,8 +47,9 @@ class NandosRequestHandlerTest {
     private NandosRequestHandler nandosRequestHandler;
 
     @Test
-    public void testCacheHit() throws JsonProcessingException {
+    public void testProductsCacheHit() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.NANDOS, 55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.NANDOS)).thenReturn(products);
         Answer answer = nandosRequestHandler.handleNandosRequest(55, 5000);
         assertThat(answer.getNormalisedProducts().size(), is(1));
@@ -57,8 +58,9 @@ class NandosRequestHandlerTest {
     }
 
     @Test
-    public void testCacheMiss() throws JsonProcessingException {
+    public void testProductsCacheMiss() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.NANDOS,55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.NANDOS)).thenReturn(Set.of());
         when(nandosClient.getProducts(any())).thenReturn(products);
         Answer answer = nandosRequestHandler.handleNandosRequest(55, 5000);

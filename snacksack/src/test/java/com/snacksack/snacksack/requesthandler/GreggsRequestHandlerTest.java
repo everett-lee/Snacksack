@@ -22,6 +22,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -55,8 +56,9 @@ class GreggsRequestHandlerTest {
     }
 
     @Test
-    public void testCacheHit() throws JsonProcessingException {
+    public void testProductsCacheHit() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.GREGGS, 1, 55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.GREGGS, 1)).thenReturn(products);
         Answer answer = greggsRequestHandler.handleGreggsRequest(55, 1, 5000);
         assertThat(answer.getNormalisedProducts().size(), is(1));
@@ -65,8 +67,9 @@ class GreggsRequestHandlerTest {
     }
 
     @Test
-    public void testCacheMiss() throws JsonProcessingException {
+    public void testProductsCacheMiss() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.GREGGS, 1, 55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.GREGGS, 1)).thenReturn(Set.of());
         when(greggsClient.getProducts(any())).thenReturn(products);
         Answer answer = greggsRequestHandler.handleGreggsRequest(55, 1, 5000);

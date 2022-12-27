@@ -19,6 +19,7 @@ import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,6 +55,7 @@ class SpoonsRequestHandlerTest {
     @Test
     public void testCacheHit() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.SPOONS, 1, 55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.SPOONS, 1)).thenReturn(products);
         Answer answer = spoonsRequestHandler.handleSpoonsRequest(55, 1, 5000);
         assertThat(answer.getNormalisedProducts().size(), is(1));
@@ -64,6 +66,7 @@ class SpoonsRequestHandlerTest {
     @Test
     public void testCacheMiss() throws JsonProcessingException {
         Set<NormalisedProduct> products = Set.of(new NormalisedProduct("Name", 1, 2));
+        when(jedisClient.getAnswer(Restaurant.SPOONS, 1, 55)).thenReturn(new Answer(-1, List.of()));
         when(jedisClient.getProducts(Restaurant.SPOONS, 1)).thenReturn(Set.of());
         when(spoonsClient.getProducts(any())).thenReturn(products);
         Answer answer = spoonsRequestHandler.handleSpoonsRequest(55, 1, 5000);

@@ -6,6 +6,7 @@ import com.snacksack.snacksack.menuclient.NandosClient;
 import com.snacksack.snacksack.menuclient.SpoonsClient;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import com.snacksack.snacksack.model.Restaurant;
+import com.snacksack.snacksack.model.answer.Answer;
 import com.snacksack.snacksack.model.nandos.NandosApiMenuData;
 import com.snacksack.snacksack.model.spoons.SpoonsApiMenuData;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.introspect.Annotated;
 import org.testcontainers.utility.DockerImageName;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -23,6 +25,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -54,7 +57,7 @@ class JedisClientTest {
     }
 
     @Test
-    public void testSetAndGetNandos() throws IOException, InterruptedException {
+    public void testSetAndGetNandosProducts() throws IOException, InterruptedException {
         //given:
         String responseJson = Helpers.readFileAsString("src/test/resources/nandos-menu.json");
         HttpClient httpClient = mock(HttpClient.class);
@@ -80,14 +83,14 @@ class JedisClientTest {
     }
 
     @Test
-    public void getNandosEmpty() throws IOException {
+    public void getNandosProductsEmpty() throws IOException {
         final Set<NormalisedProduct> products = JEDIS_CLIENT
                 .getProducts(Restaurant.NANDOS);
         assertThat(products, is(empty()));
     }
 
     @Test
-    public void testSetAndGetSpoons() throws IOException, InterruptedException {
+    public void testSetAndGetSpoonsProducts() throws IOException, InterruptedException {
         //given:
         String responseJson = Helpers.readFileAsString("src/test/resources/menu.json");
         HttpClient httpClient = mock(HttpClient.class);
@@ -112,9 +115,67 @@ class JedisClientTest {
     }
 
     @Test
-    public void getSpoonsEmpty() throws IOException {
+    public void getSpoonsProductsEmpty() throws IOException {
         final Set<NormalisedProduct> products = JEDIS_CLIENT
                 .getProducts(Restaurant.SPOONS, 0);
         assertThat(products, is(empty()));
+    }
+
+    @Test
+    public void testSetAndGetNandosAnswer() throws IOException, InterruptedException {
+        //Given:
+        Answer answer = new Answer(33, List.of(
+                new NormalisedProduct("A", 342, 34),
+                new NormalisedProduct("B", 2535, 22)
+        ));
+        JEDIS_CLIENT.setAnswer(Restaurant.NANDOS, 440, answer);
+
+        //When
+        Answer cachedAnswer = JEDIS_CLIENT.getAnswer(Restaurant.NANDOS, 440);
+
+        //Then
+        assertThat(cachedAnswer, is(notNullValue()));
+        assertThat(cachedAnswer, equalTo(answer));
+    }
+
+    @Test
+    public void testSetAndGetNandosAnswerEmpty() throws IOException, InterruptedException {
+        //Given
+        Answer defaultAnswer = new Answer(-1, List.of());
+        //When
+        Answer cachedAnswer = JEDIS_CLIENT.getAnswer(Restaurant.NANDOS, 440);
+
+        //Then
+        assertThat(cachedAnswer, is(notNullValue()));
+        assertThat(cachedAnswer, equalTo(defaultAnswer));
+    }
+
+    @Test
+    public void testSetAndGetGreggsAnswer() throws IOException, InterruptedException {
+        //Given:
+        Answer answer = new Answer(33, List.of(
+                new NormalisedProduct("A", 342, 34),
+                new NormalisedProduct("B", 2535, 22)
+        ));
+        JEDIS_CLIENT.setAnswer(Restaurant.GREGGS, 42, 440, answer);
+
+        //When
+        Answer cachedAnswer = JEDIS_CLIENT.getAnswer(Restaurant.GREGGS, 42, 440);
+
+        //Then
+        assertThat(cachedAnswer, is(notNullValue()));
+        assertThat(cachedAnswer, equalTo(answer));
+    }
+
+    @Test
+    public void testSetAndGetGreggsAnswerEmpty() throws IOException, InterruptedException {
+        //Given
+        Answer defaultAnswer = new Answer(-1, List.of());
+        //When
+        Answer cachedAnswer = JEDIS_CLIENT.getAnswer(Restaurant.GREGGS, 13,440);
+
+        //Then
+        assertThat(cachedAnswer, is(notNullValue()));
+        assertThat(cachedAnswer, equalTo(defaultAnswer));
     }
 }

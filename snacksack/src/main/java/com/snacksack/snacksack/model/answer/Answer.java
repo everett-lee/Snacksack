@@ -20,4 +20,11 @@ public class Answer {
                 .stream()
                 .mapToLong(NormalisedProduct::getPrice).sum() / 100.0;
     }
+
+    // For Jackson
+    public Answer() {
+        this.totalCalories = -1;
+        this.totalCost = -1;
+        this.normalisedProducts = List.of();
+    }
 }

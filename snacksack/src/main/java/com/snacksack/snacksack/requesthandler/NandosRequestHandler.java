@@ -26,8 +26,16 @@ public class NandosRequestHandler extends BaseRequestHandler {
 
 
     public Answer handleNandosRequest(int moneyPence, int threadedThreshold) throws JsonProcessingException {
+        final Answer cachedAnswer = this.jedisClient.getAnswer(Restaurant.NANDOS, moneyPence);
+        if (cachedAnswer.totalCalories != -1) {
+            log.info("Cached answer present, returning value");
+            return cachedAnswer;
+        }
+
         final Set<NormalisedProduct> normalisedProducts = getProducts();
-        return this.getAnswer(moneyPence, threadedThreshold, normalisedProducts);
+        final Answer answer = this.getAnswer(moneyPence, threadedThreshold, normalisedProducts);
+        this.jedisClient.setAnswer(Restaurant.NANDOS, moneyPence, answer);
+        return answer;
     }
 
     private Set<NormalisedProduct> getProducts() throws JsonProcessingException {
