@@ -13,7 +13,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -49,11 +48,10 @@ public class JedisClient {
 
         try {
             final String stringJson = objectMapper.writeValueAsString(products);
-            final String jsonStringEncoded = Base64.getEncoder().encodeToString(stringJson.getBytes());
             log.info("Setting value for key: {}", key);
 
             try (Jedis jedis = jedisPool.getResource()){
-                jedis.set(key, jsonStringEncoded, this.setParams);
+                jedis.set(key, stringJson, this.setParams);
             }
 
             log.info("Key: {} set", key);
@@ -92,9 +90,7 @@ public class JedisClient {
             }
 
             try {
-                final byte[] decodedBytes = Base64.getDecoder().decode(result);
-                final String decodedJsonString = new String(decodedBytes);
-                final Set<NormalisedProduct> results = objectMapper.readValue(decodedJsonString, new TypeReference<>() {});
+                final Set<NormalisedProduct> results = objectMapper.readValue(result, new TypeReference<>() {});
                 log.info("Returning {} results", results.size());
                 return results;
             } catch (JsonProcessingException e) {
@@ -116,11 +112,10 @@ public class JedisClient {
         final String answerCacheKey = this.getAnswerCacheKey(restaurant, locationId, money);
         try {
             final String stringJson = objectMapper.writeValueAsString(answer);
-            final String jsonStringEncoded = Base64.getEncoder().encodeToString(stringJson.getBytes());
             log.info("Setting value for key: {}", answerCacheKey);
 
             try (Jedis jedis = jedisPool.getResource()){
-                jedis.set(answerCacheKey, jsonStringEncoded, this.setParams);
+                jedis.set(answerCacheKey, stringJson, this.setParams);
             }
 
             log.info("Key: {} set", answerCacheKey);
@@ -150,9 +145,7 @@ public class JedisClient {
             }
 
             try {
-                final byte[] decodedBytes = Base64.getDecoder().decode(result);
-                final String decodedJsonString = new String(decodedBytes);
-                return objectMapper.readValue(decodedJsonString, Answer.class);
+                return objectMapper.readValue(result, Answer.class);
             } catch (JsonProcessingException e) {
                 log.error("Failed to process menu data json");
                 throw e;
