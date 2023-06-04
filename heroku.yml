@@ -4,3 +4,5 @@ build:
   config:
     JAR_FILE: snacksack*SNAPSHOT.jar
     CUSTOM_OPTIONS: "-Xmx400m -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
+run:
+  web: java "-Xmx400m -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport" -jar /app.jar --port $PORT
