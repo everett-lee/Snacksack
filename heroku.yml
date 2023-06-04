@@ -1,4 +1,7 @@
 build:
+  gradle:
+    tasks:
+      - ":build"
   docker:
     web: ./snacksack/Dockerfile
   config:
