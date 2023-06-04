@@ -36,6 +36,12 @@ dependencies {
 	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 }
 
+test {
+	minHeapSize = "1024m" // initial heap size
+	maxHeapSize = "2048m" // maximum heap size
+}
+
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
