@@ -7,17 +7,17 @@ options at popular restaurants. Fine dining institutions Nandos and Greggs are c
 
 Get the maximum calories for a money amount of £33.33 at Nandos:
 ```bash
-    curl "https://snacksack-app.herokuapp.com/snacksack/nandos?money=33.33" | jq
+    curl "https://snacksack.herokuapp.com/snacksack/nandos?money=33.33" | jq
 ```
 
 Get JSON containing all location IDs for Greggs at:
 ```bash
-    curl "https://snacksack-app.herokuapp.com/location/greggs" | jq
+    curl "https://snacksack.herokuapp.com/location/greggs" | jq
 ```
 
 Get the maximum calories for a money amount of £33.33 at Greggs location with id '874':
 ```bash
-    curl "https://snacksack-app.herokuapp.com/snacksack/greggs?locationId=874&money=33.33" | jq
+    curl "https://snacksack.herokuapp.com/snacksack/greggs?locationId=874&money=33.33" | jq
 ```
 
 <h3> Implementation </h3>
