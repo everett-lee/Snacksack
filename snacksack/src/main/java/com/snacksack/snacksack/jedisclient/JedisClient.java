@@ -21,6 +21,7 @@ import java.util.Set;
 public class JedisClient {
 
     private final JedisPool jedisPool;
+
     private final ObjectMapper objectMapper;
 
     private final SetParams setParams;

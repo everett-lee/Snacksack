@@ -4,6 +4,7 @@ package com.snacksack.snacksack;
 import com.snacksack.snacksack.dp.Solver;
 import com.snacksack.snacksack.dp.bottomUp.BottomUpSolver;
 import com.snacksack.snacksack.dp.bottomUp.BottomUpSolverThreaded;
+import com.snacksack.snacksack.dp.topDown.TopDownSolver;
 import com.snacksack.snacksack.model.NormalisedProduct;
 import java.util.Random;
 import java.util.Set;
@@ -47,16 +48,22 @@ public class DpBenchmark {
     }
 
     @Benchmark
+    public void testTopDown() {
+        Solver solver = new TopDownSolver();
+        solver.solve(75_000, this.products);
+    }
+
+    @Benchmark
     public void testBottomUp() {
         Solver solver = new BottomUpSolver();
         solver.solve(75_000, this.products);
     }
 
-    @Benchmark
-    public void testBottomUpThreaded() {
-        Solver solver = new BottomUpSolverThreaded(5_000);
-        solver.solve(75_000, this.products);
-    }
+//    @Benchmark
+//    public void testBottomUpThreaded() {
+//        Solver solver = new BottomUpSolverThreaded(5_000);
+//        solver.solve(75_000, this.products);
+//    }
 
     ///////////////////////////////////////////////////////////////////////////////////
     // total money = 500,000, threshold = 5_000

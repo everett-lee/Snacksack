@@ -28,6 +28,12 @@ dependencies {
 	testImplementation "org.testcontainers:junit-jupiter:1.17.6"
 
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+	jmh 'org.openjdk.jmh:jmh-core:1.36'
+	jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+
+	// this is the line that solves the missing /META-INF/BenchmarkList error
+	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 }
 
 tasks.named('test') {

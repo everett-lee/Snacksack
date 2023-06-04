@@ -8,5 +8,6 @@ import java.util.List;
 @Data
 public class RecursiveHelperResult {
     final int totalHere;
-    final List<NormalisedProduct> solutionProducts;
+    final RecursiveHelperResult previous;
+    final NormalisedProduct product;
 }
